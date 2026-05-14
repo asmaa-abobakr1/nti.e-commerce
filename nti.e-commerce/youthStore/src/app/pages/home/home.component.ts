@@ -4,11 +4,14 @@ import { RouterModule } from '@angular/router';
 import { ProductService } from '../../services/product.service';
 import { TestimonialService } from '../../services/testimonial.service';
 import { SettingsService } from '../../services/settings.service';
+import { CartService } from '../../services/cart.service';
+import { ProductCardComponent } from '../../components/product-card/product-card.component';
+import { TestimonialSliderComponent } from '../../components/testimonial-slider/testimonial-slider.component';
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, ProductCardComponent, TestimonialSliderComponent],
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.css']
 })
@@ -16,6 +19,7 @@ export class HomeComponent implements OnInit {
   productService = inject(ProductService);
   testimonialService = inject(TestimonialService);
   settingsService = inject(SettingsService);
+  cartService = inject(CartService);
 
   newArrivals: any[] = [];
   bestSellers: any[] = [];
@@ -48,5 +52,9 @@ export class HomeComponent implements OnInit {
     this.testimonialService.getApproved().subscribe(res => {
       this.testimonials = res.data.testimonials;
     });
+  }
+
+  addToCart(product: any) {
+    this.cartService.addToCart(product);
   }
 }
