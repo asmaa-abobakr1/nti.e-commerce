@@ -1,0 +1,21 @@
+.address-card {
+  background-color: white;
+  border: 2px solid transparent;
+  transition: all 0.3s ease;
+}
+
+.address-card:hover {
+  background-color: rgba(99, 102, 241, 0.05);
+}
+
+.border-dashed {
+  border-style: dashed !important;
+}
+
+.cursor-pointer {
+  cursor: pointer;
+}
+
+.sticky-top {
+  z-index: 100;
+}

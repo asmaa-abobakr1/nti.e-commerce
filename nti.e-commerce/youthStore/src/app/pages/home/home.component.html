@@ -1,0 +1,108 @@
+<!-- Hero Section -->
+<section class="hero-section py-5 d-flex align-items-center">
+  <div class="container">
+    <div class="row align-items-center">
+      <div class="col-lg-6" data-aos="fade-right">
+        <h1 class="display-3 fw-bolder mb-4 text-dark">{{settings?.heroTitle || 'DEFINE YOUR CASUAL STYLE'}}</h1>
+        <p class="lead mb-5 text-gray">{{settings?.heroSubtitle || 'Exclusive casual collections for the youth generation.'}}</p>
+        <div class="d-flex gap-3">
+          <a routerLink="/shop" class="btn btn-primary btn-lg px-5 rounded-pill shadow-lg">Shop Now</a>
+          <a routerLink="/shop" class="btn btn-outline-dark btn-lg px-5 rounded-pill">Explore</a>
+        </div>
+      </div>
+      <div class="col-lg-6 d-none d-lg-block" data-aos="zoom-in">
+        <div class="hero-img-container position-relative">
+          <div class="img-blob bg-primary opacity-10"></div>
+          <img src="C:\Users\acer\.gemini\antigravity\brain\3af0a81a-d301-4fac-9c81-703da9e956c3\youth_fashion_hero_1778673468322.png" class="img-fluid rounded-5 shadow-2xl floating-img" alt="Youth Fashion">
+          <div class="floating-badge glass-morphism p-3 rounded-4 shadow-lg animate-bounce-slow">
+            <span class="d-block fw-bold fs-4">New Season</span>
+            <span class="text-secondary">Up to 40% Off</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Marketing Slider (Random Pics) -->
+<section class="py-4 bg-light overflow-hidden">
+  <div class="container-fluid px-0">
+    <div class="marketing-slider-track d-flex gap-4">
+      <div class="marketing-card rounded-4 shadow-sm" *ngFor="let i of [1,2,3,4,5,6]">
+        <img [src]="'https://picsum.photos/400/300?random=' + i" class="rounded-4" alt="Marketing">
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- New Arrivals -->
+<section class="py-5 bg-white">
+  <div class="container">
+    <h2 class="section-title">{{settings?.newArrivalsTitle || 'New Arrivals'}}</h2>
+    <div class="row g-4 mt-2">
+      <div class="col-md-4 col-lg-2" *ngFor="let prod of newArrivals">
+        <div class="card product-card h-100 border-0 shadow-sm rounded-4 overflow-hidden">
+          <div class="position-relative">
+            <img [src]="prod.img" class="card-img-top" [alt]="prod.title">
+            <span class="badge bg-danger position-absolute top-0 end-0 m-3" *ngIf="prod.stock <= 3 && prod.stock > 0">Only {{prod.stock}} left!</span>
+            <span class="badge bg-dark position-absolute top-0 end-0 m-3" *ngIf="prod.stock === 0">Out of Stock</span>
+          </div>
+          <div class="card-body p-3">
+            <h6 class="fw-bold mb-1">{{prod.title}}</h6>
+            <p class="text-gray small mb-2">{{prod.category?.title}}</p>
+            <div class="d-flex justify-content-between align-items-center">
+              <span class="fw-bolder text-primary">${{prod.price}}</span>
+              <button class="btn btn-sm btn-primary rounded-circle shadow-sm" (click)="productService.getProduct(prod._id)">
+                <i class="fas fa-plus"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Best Sellers -->
+<section class="py-5 bg-light">
+  <div class="container">
+    <h2 class="section-title">Best Sellers</h2>
+    <div class="row g-4 mt-2">
+      <div class="col-md-6 col-lg-3" *ngFor="let prod of bestSellers">
+        <!-- Reusing product card style -->
+        <div class="card product-card h-100 shadow-sm rounded-4">
+          <img [src]="prod.img" class="card-img-top" [alt]="prod.title">
+          <div class="card-body">
+            <h5 class="fw-bold">{{prod.title}}</h5>
+            <p class="text-primary fw-bolder">${{prod.price}}</p>
+            <a [routerLink]="['/product', prod._id]" class="btn btn-outline-primary w-100 rounded-pill">View Details</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Testimonials Slider -->
+<section class="py-5 bg-white overflow-hidden">
+  <div class="container">
+    <h2 class="section-title">What They Say</h2>
+    <div class="testimonial-track d-flex gap-4 mt-5">
+      <div class="testimonial-card glass-morphism p-4 rounded-5 shadow-sm min-w-300" *ngFor="let t of testimonials">
+        <div class="d-flex gap-1 text-warning mb-3">
+          <i class="fas fa-star" *ngFor="let s of [1,2,3,4,5]"></i>
+        </div>
+        <p class="fst-italic text-gray mb-4">"{{t.content}}"</p>
+        <div class="d-flex align-items-center gap-3">
+          <div class="avatar bg-primary text-white rounded-circle d-flex align-items-center justify-content-center fw-bold" style="width: 40px; height: 40px;">
+            {{t.name[0]}}
+          </div>
+          <div>
+            <h6 class="mb-0 fw-bold">{{t.name}}</h6>
+            <small class="text-gray">{{t.date | date}}</small>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

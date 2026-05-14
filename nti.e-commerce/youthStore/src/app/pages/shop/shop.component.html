@@ -1,0 +1,79 @@
+<div class="container py-5">
+  <div class="row g-4">
+    <!-- Filters Sidebar -->
+    <div class="col-lg-3">
+      <div class="card glass-morphism p-4 rounded-4 shadow-sm">
+        <h5 class="fw-bold mb-4">Filters</h5>
+        
+        <!-- Search -->
+        <div class="mb-4">
+          <label class="form-label small fw-bold">Search</label>
+          <input type="text" class="form-control rounded-pill" [(ngModel)]="filters.name" (ngModelChange)="applyFilters()" placeholder="Product name...">
+        </div>
+
+        <!-- Categories -->
+        <div class="mb-4">
+          <label class="form-label small fw-bold">Category</label>
+          <select class="form-select rounded-pill" [(ngModel)]="filters.category" (change)="applyFilters()">
+            <option value="">All Categories</option>
+            <option *ngFor="let cat of categories" [value]="cat._id">{{cat.title}}</option>
+          </select>
+        </div>
+
+        <!-- Gender -->
+        <div class="mb-4">
+          <label class="form-label small fw-bold">Gender</label>
+          <div class="d-flex gap-2">
+            <button class="btn btn-sm btn-outline-primary rounded-pill flex-grow-1" [class.active]="filters.gender === 'boys'" (click)="filters.gender = 'boys'; applyFilters()">Boys</button>
+            <button class="btn btn-sm btn-outline-primary rounded-pill flex-grow-1" [class.active]="filters.gender === 'girls'" (click)="filters.gender = 'girls'; applyFilters()">Girls</button>
+          </div>
+        </div>
+
+        <!-- Price Range -->
+        <div class="mb-4">
+          <label class="form-label small fw-bold">Price Range (${{filters.minPrice}} - ${{filters.maxPrice}})</label>
+          <input type="range" class="form-range" min="0" max="2000" step="50" [(ngModel)]="filters.maxPrice" (change)="applyFilters()">
+        </div>
+
+        <button class="btn btn-primary w-100 rounded-pill" (click)="filters = {name: '', category: '', gender: '', minPrice: 0, maxPrice: 1000}; applyFilters()">Reset Filters</button>
+      </div>
+    </div>
+
+    <!-- Product Grid -->
+    <div class="col-lg-9">
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <h4 class="fw-bold mb-0">Collections <span class="text-gray fw-normal fs-6">({{products.length}} items)</span></h4>
+        <select class="form-select w-auto rounded-pill border-0 shadow-sm px-4 py-2">
+          <option>Sort by: Newest</option>
+          <option>Price: Low to High</option>
+          <option>Price: High to Low</option>
+        </select>
+      </div>
+
+      <div class="row g-4">
+        <div class="col-md-6 col-lg-4" *ngFor="let prod of products">
+          <div class="card h-100 product-card border-0 shadow-sm rounded-4 overflow-hidden">
+            <div class="position-relative">
+              <img [src]="prod.img" class="card-img-top" [alt]="prod.title">
+              <span class="badge bg-danger position-absolute top-0 end-0 m-3" *ngIf="prod.stock <= 3 && prod.stock > 0">Only {{prod.stock}} left!</span>
+              <span class="badge bg-dark position-absolute top-0 end-0 m-3" *ngIf="prod.stock === 0">Out of Stock</span>
+            </div>
+            <div class="card-body p-4">
+              <div class="d-flex justify-content-between mb-2">
+                <span class="text-gray small">{{prod.category?.title}}</span>
+                <span class="text-primary small fw-bold text-uppercase">{{prod.gender}}</span>
+              </div>
+              <h6 class="fw-bold mb-3 fs-5">{{prod.title}}</h6>
+              <div class="d-flex justify-content-between align-items-center">
+                <span class="fw-bolder text-primary fs-4">${{prod.price}}</span>
+                <button class="btn btn-primary rounded-pill px-4" (click)="addToCart(prod)" [disabled]="prod.stock === 0">
+                  <i class="fas fa-shopping-cart me-2"></i>Add
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

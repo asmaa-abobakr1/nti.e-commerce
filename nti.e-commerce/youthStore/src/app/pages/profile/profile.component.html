@@ -1,0 +1,76 @@
+<div class="container py-5">
+  <div class="d-flex justify-content-between align-items-center mb-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <h2 class="fw-bolder mb-0">My <span class="text-primary">Orders</span></h2>
+      <a routerLink="/admin" class="btn btn-danger rounded-pill px-4 py-2 fw-bold ms-3" *ngIf="authService.isAdmin()">
+        <i class="fas fa-lock me-2"></i>Admin Dashboard
+      </a>
+    </div>
+    <div class="d-flex gap-3">
+      <button class="btn btn-outline-primary rounded-pill px-4" (click)="loadOrders()">
+        <i class="fas fa-sync-alt me-2"></i>Refresh
+      </button>
+    </div>
+  </div>
+
+  <div class="row g-4">
+    <div class="col-12" *ngFor="let order of orders">
+      <div class="card border-0 shadow-sm rounded-5 p-4 overflow-hidden">
+        <div class="row align-items-center">
+          <div class="col-md-2">
+            <span class="small text-gray d-block mb-1">Order Date</span>
+            <h6 class="fw-bold mb-0">{{order.orderAt | date:'mediumDate'}}</h6>
+          </div>
+          <div class="col-md-3">
+            <span class="small text-gray d-block mb-1">Shipping To</span>
+            <h6 class="fw-bold mb-0 text-truncate">{{order.address}}</h6>
+          </div>
+          <div class="col-md-2">
+            <span class="small text-gray d-block mb-1">Total Price</span>
+            <h6 class="fw-bolder text-primary mb-0">${{order.totalPrice}}</h6>
+          </div>
+          <div class="col-md-2 text-center">
+            <span class="badge rounded-pill px-3 py-2 text-uppercase" [ngClass]="getStatusClass(order.status)">
+              {{order.status}}
+            </span>
+          </div>
+          <div class="col-md-3 text-end">
+            <div class="d-flex gap-2 justify-content-end">
+              <button class="btn btn-sm btn-outline-danger rounded-pill px-3" 
+                      *ngIf="order.status === 'pending' || order.status === 'preparing'"
+                      (click)="cancelOrder(order._id)">Cancel</button>
+              
+              <button class="btn btn-sm btn-outline-warning rounded-pill px-3" 
+                      *ngIf="order.status === 'delivered' && order.refundStatus === 'none'"
+                      (click)="requestRefund(order._id)">Refund</button>
+              
+              <span class="badge bg-light text-dark rounded-pill border py-2 px-3" *ngIf="order.refundStatus !== 'none'">
+                Refund: {{order.refundStatus}}
+              </span>
+            </div>
+          </div>
+        </div>
+        
+        <div class="mt-4 pt-4 border-top">
+          <div class="d-flex gap-3 overflow-auto">
+            <div class="bg-light p-2 rounded-4 d-flex align-items-center gap-2" *ngFor="let item of order.products" style="min-width: 200px;">
+              <img [src]="item.product.img" width="50" height="50" class="rounded-3" style="object-fit: cover;">
+              <div class="flex-grow-1">
+                <h6 class="small fw-bold mb-0 text-truncate" style="max-width: 120px;">{{item.product.title}}</h6>
+                <small class="text-gray">{{item.count}} x ${{item.price}}</small>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-12 text-center py-5" *ngIf="!orders.length">
+      <div class="py-5">
+        <i class="fas fa-box-open fs-1 text-gray mb-3 opacity-25"></i>
+        <h4 class="text-gray">No orders found</h4>
+        <a routerLink="/shop" class="btn btn-primary rounded-pill px-5 mt-3">Start Shopping</a>
+      </div>
+    </div>
+  </div>
+</div>

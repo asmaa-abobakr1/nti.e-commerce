@@ -1,0 +1,38 @@
+<div class="auth-container d-flex align-items-center justify-content-center">
+  <div class="card auth-card glass-morphism p-5 rounded-5 shadow-lg border-0">
+    <div class="text-center mb-5">
+      <h2 class="fw-bolder text-primary mb-1">Welcome Back</h2>
+      <p class="text-gray">Login to your YouthStore account</p>
+    </div>
+
+    <form (submit)="login()">
+      <div class="mb-4">
+        <label class="form-label small fw-bold">Phone Number</label>
+        <div class="input-group">
+          <span class="input-group-text bg-transparent border-end-0 rounded-start-pill"><i class="fas fa-phone text-primary"></i></span>
+          <input type="text" class="form-control border-start-0 rounded-end-pill py-2" [(ngModel)]="credentials.phone" name="phone" required placeholder="01xxxxxxxxx">
+        </div>
+      </div>
+
+      <div class="mb-4">
+        <label class="form-label small fw-bold">Password</label>
+        <div class="input-group">
+          <span class="input-group-text bg-transparent border-end-0 rounded-start-pill"><i class="fas fa-lock text-primary"></i></span>
+          <input type="password" class="form-control border-start-0 rounded-end-pill py-2" [(ngModel)]="credentials.password" name="password" required placeholder="••••••••">
+        </div>
+      </div>
+
+      <div class="alert alert-danger rounded-4 py-2" *ngIf="error">
+        <i class="fas fa-exclamation-circle me-2"></i>{{error}}
+      </div>
+
+      <button type="submit" class="btn btn-primary w-100 rounded-pill py-3 fw-bold shadow-lg mt-3">
+        LOGIN <i class="fas fa-arrow-right ms-2"></i>
+      </button>
+    </form>
+
+    <div class="text-center mt-4">
+      <p class="text-gray small">Don't have an account? <a routerLink="/signup" class="text-primary fw-bold text-decoration-none">Sign Up</a></p>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,56 @@
+<div class="auth-container d-flex align-items-center justify-content-center py-5">
+  <div class="card auth-card glass-morphism p-5 rounded-5 shadow-lg border-0">
+    <div class="text-center mb-5">
+      <h2 class="fw-bolder text-primary mb-1">Create Account</h2>
+      <p class="text-gray">Join the YouthStore community</p>
+    </div>
+
+    <form (submit)="signup()">
+      <div class="mb-3">
+        <label class="form-label small fw-bold">Full Name</label>
+        <input type="text" class="form-control rounded-pill py-2" [(ngModel)]="userData.name" name="name" required placeholder="John Doe">
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label small fw-bold">Phone Number</label>
+        <input type="text" class="form-control rounded-pill py-2" [(ngModel)]="userData.phone" name="phone" required placeholder="01xxxxxxxxx">
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label small fw-bold">Email (Optional)</label>
+        <input type="email" class="form-control rounded-pill py-2" [(ngModel)]="userData.email" name="email" placeholder="john@example.com">
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label small fw-bold">Gender</label>
+        <div class="d-flex gap-3 mt-1">
+          <div class="form-check">
+            <input class="form-check-input" type="radio" name="gender" [(ngModel)]="userData.gender" value="male" id="male">
+            <label class="form-check-label" for="male">Male</label>
+          </div>
+          <div class="form-check">
+            <input class="form-check-input" type="radio" name="gender" [(ngModel)]="userData.gender" value="female" id="female">
+            <label class="form-check-label" for="female">Female</label>
+          </div>
+        </div>
+      </div>
+
+      <div class="mb-4">
+        <label class="form-label small fw-bold">Password</label>
+        <input type="password" class="form-control rounded-pill py-2" [(ngModel)]="userData.password" name="password" required placeholder="Min 6 characters">
+      </div>
+
+      <div class="alert alert-danger rounded-4 py-2" *ngIf="error">
+        {{error}}
+      </div>
+
+      <button type="submit" class="btn btn-primary w-100 rounded-pill py-3 fw-bold shadow-lg mt-2">
+        SIGN UP
+      </button>
+    </form>
+
+    <div class="text-center mt-4">
+      <p class="text-gray small">Already have an account? <a routerLink="/login" class="text-primary fw-bold text-decoration-none">Login</a></p>
+    </div>
+  </div>
+</div>

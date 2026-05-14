@@ -1,0 +1,27 @@
+.auth-container {
+  min-height: calc(100vh - 100px);
+  background: radial-gradient(circle at center, rgba(99, 102, 241, 0.05), transparent);
+}
+
+.auth-card {
+  width: 100%;
+  max-width: 450px;
+}
+
+.input-group-text {
+  border-right: none;
+}
+
+.form-control:focus {
+  box-shadow: none;
+  border-color: rgba(0,0,0,0.1);
+}
+
+.btn-primary {
+  transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 20px -5px rgba(99, 102, 241, 0.4);
+}
