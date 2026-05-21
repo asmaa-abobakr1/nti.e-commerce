@@ -2,6 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { AuthService } from './auth.service';
+import { CartItem, Product, ApiResponse } from '../models/interfaces';
 
 @Injectable({
   providedIn: 'root'
@@ -11,7 +12,7 @@ export class CartService {
   private authService = inject(AuthService);
   private userUrl = 'http://localhost:5000/api/v1/users';
 
-  private cartSubject = new BehaviorSubject<any[]>([]);
+  private cartSubject = new BehaviorSubject<CartItem[]>([]);
   cart$ = this.cartSubject.asObservable();
 
   constructor() {
@@ -33,13 +34,13 @@ export class CartService {
   }
 
   private fetchUserCart() {
-    this.http.get(`${this.userUrl}/me`).subscribe((res: any) => {
+    this.http.get<ApiResponse<{ user: { cart: CartItem[] } }>>(`${this.userUrl}/me`).subscribe((res) => {
       this.cartSubject.next(res.data.user.cart || []);
     });
   }
 
-  addToCart(product: any, count: number = 1) {
-    const currentCart = this.cartSubject.value;
+  addToCart(product: Product, count: number = 1) {
+    const currentCart = [...this.cartSubject.value];
     const existingItem = currentCart.find(item => item.product._id === product._id);
 
     if (existingItem) {
@@ -57,7 +58,7 @@ export class CartService {
   }
 
   updateCount(productId: string, count: number) {
-    const currentCart = this.cartSubject.value;
+    const currentCart = [...this.cartSubject.value];
     const item = currentCart.find(i => i.product._id === productId);
     if (item) {
       item.count = count;
@@ -74,11 +75,21 @@ export class CartService {
     this.updateCart(currentCart);
   }
 
-  private updateCart(cart: any[]) {
+  acceptNewPrice(productId: string, newPrice: number) {
+    const currentCart = [...this.cartSubject.value];
+    const item = currentCart.find(i => i.product._id === productId);
+    if (item) {
+      item.price = newPrice;
+      item.isPriceChanged = false;
+      this.updateCart(currentCart);
+    }
+  }
+
+  private updateCart(cart: CartItem[]) {
     this.cartSubject.next(cart);
     if (this.authService.isLoggedIn()) {
       // Sync to DB
-      this.http.patch(`${this.userUrl}/updateCart`, { cart }).subscribe();
+      this.http.patch<ApiResponse<{ cart: CartItem[] }>>(`${this.userUrl}/updateCart`, { cart }).subscribe();
     } else {
       // Save to local storage
       localStorage.setItem('cart', JSON.stringify(cart));
@@ -89,7 +100,7 @@ export class CartService {
     this.cartSubject.next([]);
     localStorage.removeItem('cart');
     if (this.authService.isLoggedIn()) {
-      this.http.patch(`${this.userUrl}/updateCart`, { cart: [] }).subscribe();
+      this.http.patch<ApiResponse<{ cart: CartItem[] }>>(`${this.userUrl}/updateCart`, { cart: [] }).subscribe();
     }
   }
 }

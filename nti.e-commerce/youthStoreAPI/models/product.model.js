@@ -45,6 +45,14 @@ const productSchema = new mongoose.Schema({
     type: Boolean,
     default: true,
   },
+  isNewArrival: {
+    type: Boolean,
+    default: false,
+  },
+  isBestSeller: {
+    type: Boolean,
+    default: false,
+  },
   isDeleted: {
     type: Boolean,
     default: false,

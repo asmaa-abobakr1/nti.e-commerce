@@ -24,7 +24,13 @@ export class LoginComponent {
 
   login() {
     this.authService.login(this.credentials).subscribe({
-      next: () => this.router.navigate(['/']),
+      next: () => {
+        if (this.authService.isAdmin()) {
+          this.router.navigate(['/admin']);
+        } else {
+          this.router.navigate(['/']);
+        }
+      },
       error: (err) => this.error = err.error.message || 'Login failed'
     });
   }

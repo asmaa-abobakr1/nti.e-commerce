@@ -8,11 +8,43 @@ exports.getAllProducts = async (req, res, next) => {
     const excludedFields = ['page', 'sort', 'limit', 'fields'];
     excludedFields.forEach(el => delete queryObj[el]);
 
-    // Advanced filtering (price range)
-    let queryStr = JSON.stringify(queryObj);
-    queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, match => `$${match}`);
-    
-    let query = Product.find(JSON.parse(queryStr)).populate('category subCategory');
+    // Advanced filtering
+    let filterObj = {};
+    Object.keys(queryObj).forEach(key => {
+      let val = queryObj[key];
+      
+      // Handle price[gte]=0 or price: { gte: 0 }
+      let targetKey = key;
+      let operator = null;
+      
+      const match = key.match(/(.+)\[(.+)\]/);
+      if (match) {
+        targetKey = match[1];
+        operator = match[2];
+      }
+
+      if (operator) {
+        const mongoOp = ['gte', 'gt', 'lte', 'lt', 'regex', 'options'].includes(operator) ? `$${operator}` : operator;
+        if (!filterObj[targetKey]) filterObj[targetKey] = {};
+        let finalVal = val;
+        if (!isNaN(finalVal) && typeof finalVal === 'string' && finalVal.trim() !== '') finalVal = Number(finalVal);
+        filterObj[targetKey][mongoOp] = finalVal;
+      } else if (typeof val === 'object' && val !== null) {
+        filterObj[key] = {};
+        Object.keys(val).forEach(op => {
+          const mongoOp = ['gte', 'gt', 'lte', 'lt', 'regex', 'options'].includes(op) ? `$${op}` : op;
+          let finalVal = val[op];
+          if (!isNaN(finalVal) && typeof finalVal === 'string' && finalVal.trim() !== '') finalVal = Number(finalVal);
+          filterObj[key][mongoOp] = finalVal;
+        });
+      } else if (val !== '') {
+        filterObj[key] = val;
+      }
+    });
+
+    console.log('Final Filter Object:', JSON.stringify(filterObj, null, 2));
+
+    let query = Product.find(filterObj).populate('category subCategory');
 
     // 2) Sorting
     if (req.query.sort) {
@@ -64,7 +96,7 @@ exports.updateProduct = async (req, res, next) => {
       req.body.img = `${req.protocol}://${req.get('host')}/uploads/${req.file.filename}`;
     }
     const product = await Product.findByIdAndUpdate(req.params.id, req.body, {
-      new: true,
+      returnDocument: 'after',
       runValidators: true
     });
     if (!product) return next(new AppError('No product found with that ID', 404));

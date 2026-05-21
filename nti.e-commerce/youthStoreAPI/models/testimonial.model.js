@@ -18,8 +18,12 @@ const testimonialSchema = new mongoose.Schema({
   },
   isApproved: {
     type: Number,
-    enum: [1, 2, 3], // 1: Approved, 2: Pending/Not Seen, 3: Pending/Seen
+    enum: [1, 2, 3], // 1: Approved, 2: Pending, 3: Refused
     default: 2,
+  },
+  user: {
+    type: mongoose.Schema.ObjectId,
+    ref: 'User'
   },
   isFeaturedInSlider: {
     type: Boolean,

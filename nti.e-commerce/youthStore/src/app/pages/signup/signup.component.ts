@@ -4,6 +4,15 @@ import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 
+interface SignupForm {
+  name: string;
+  phone: string;
+  password: string;
+  gender: 'male' | 'female';
+  email: string;
+  acceptsEmails: boolean;
+}
+
 @Component({
   selector: 'app-signup',
   standalone: true,
@@ -12,23 +21,30 @@ import { AuthService } from '../../services/auth.service';
   styleUrls: ['./signup.component.css']
 })
 export class SignupComponent {
-  authService = inject(AuthService);
-  router = inject(Router);
+  private authService = inject(AuthService);
+  private router = inject(Router);
 
-  userData = {
+  userData: SignupForm = {
     name: '',
     phone: '',
     password: '',
     gender: 'male',
-    email: ''
+    email: '',
+    acceptsEmails: false
   };
 
   error: string = '';
 
   signup() {
     this.authService.signup(this.userData).subscribe({
-      next: () => this.router.navigate(['/']),
-      error: (err) => this.error = err.error.message || 'Signup failed'
+      next: () => {
+        if (this.authService.isAdmin()) {
+          this.router.navigate(['/admin']);
+        } else {
+          this.router.navigate(['/']);
+        }
+      },
+      error: (err) => this.error = err.error?.message || 'Signup failed'
     });
   }
 }

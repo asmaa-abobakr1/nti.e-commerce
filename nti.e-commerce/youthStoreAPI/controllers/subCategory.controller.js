@@ -18,7 +18,7 @@ exports.createSubCategory = async (req, res, next) => {
 exports.updateSubCategory = async (req, res, next) => {
   try {
     const subCategory = await SubCategory.findByIdAndUpdate(req.params.id, req.body, {
-      new: true,
+      returnDocument: 'after',
       runValidators: true
     });
     res.status(200).json({ status: 'success', data: { subCategory } });

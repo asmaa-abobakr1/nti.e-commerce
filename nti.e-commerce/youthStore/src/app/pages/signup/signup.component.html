@@ -40,6 +40,11 @@
         <input type="password" class="form-control rounded-pill py-2" [(ngModel)]="userData.password" name="password" required placeholder="Min 6 characters">
       </div>
 
+      <div class="mb-3 form-check">
+        <input type="checkbox" class="form-check-input" id="acceptsEmails" [(ngModel)]="userData.acceptsEmails" name="acceptsEmails">
+        <label class="form-check-label small" for="acceptsEmails">I agree to receive promotional emails</label>
+      </div>
+
       <div class="alert alert-danger rounded-4 py-2" *ngIf="error">
         {{error}}
       </div>

@@ -2,6 +2,7 @@ import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ProductService } from '../../../services/product.service';
 import { FormsModule } from '@angular/forms';
+import { Category, SubCategory } from '../../../models/interfaces';
 
 @Component({
   selector: 'app-subcategory-management',
@@ -27,7 +28,7 @@ import { FormsModule } from '@angular/forms';
         <tbody>
           <tr *ngFor="let sub of subCategories">
             <td>{{sub.title}}</td>
-            <td>{{sub.category?.title}}</td>
+            <td>{{ getCategoryTitle(sub.category) }}</td>
             <td>
               <button class="btn btn-sm btn-light rounded-circle me-2" (click)="editSub(sub)"><i class="fas fa-edit"></i></button>
               <button class="btn btn-sm btn-light text-danger rounded-circle" (click)="deleteSub(sub._id)"><i class="fas fa-trash-alt"></i></button>
@@ -62,20 +63,30 @@ import { FormsModule } from '@angular/forms';
   `
 })
 export class SubCategoryManagementComponent implements OnInit {
-  productService = inject(ProductService);
-  subCategories: any[] = [];
-  categories: any[] = [];
+  private productService = inject(ProductService);
+  subCategories: SubCategory[] = [];
+  categories: Category[] = [];
   showForm = false;
   editingId: string | null = null;
-  currentSub: any = { title: '', category: '' };
+  currentSub: { title: string, category: string } = { title: '', category: '' };
 
   ngOnInit() {
     this.load();
     this.productService.getCategories().subscribe(res => this.categories = res.data.categories);
   }
 
+  getCategoryTitle(cat: string | Category): string {
+    if (typeof cat === 'string') {
+      return this.categories.find(c => c._id === cat)?.title || 'Unknown';
+    }
+    return cat?.title || 'Unknown';
+  }
+
   load() {
-    this.productService.getSubCategories().subscribe(res => this.subCategories = res.data.subCategories);
+    this.productService.getSubCategories().subscribe(res => {
+       // Backend renamed to subcategories in interface
+       this.subCategories = (res.data as any).subcategories || (res.data as any).subCategories;
+    });
   }
 
   openForm() {
@@ -84,9 +95,12 @@ export class SubCategoryManagementComponent implements OnInit {
     this.showForm = true;
   }
 
-  editSub(sub: any) {
+  editSub(sub: SubCategory) {
     this.editingId = sub._id;
-    this.currentSub = { title: sub.title, category: sub.category?._id || sub.category };
+    this.currentSub = { 
+      title: sub.title, 
+      category: typeof sub.category === 'string' ? sub.category : sub.category?._id || '' 
+    };
     this.showForm = true;
   }
 

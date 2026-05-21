@@ -5,6 +5,9 @@ const AppError = require('../utilites/appError.uti');
 
 exports.createOrder = async (req, res, next) => {
   try {
+    if (req.user.role === 'admin') {
+      return next(new AppError('Admins cannot create orders', 403));
+    }
     const { products, address } = req.body; // products: [{product: id, count: n}]
 
     // 1) Check stock for all products
@@ -22,7 +25,7 @@ exports.createOrder = async (req, res, next) => {
     for (const item of products) {
       const prod = await Product.findByIdAndUpdate(item.product, {
         $inc: { stock: -item.count }
-      }, { new: true });
+      }, { returnDocument: 'after' });
       
       orderProducts.push({
         product: prod._id,
@@ -50,21 +53,26 @@ exports.createOrder = async (req, res, next) => {
 
 exports.getMyOrders = async (req, res, next) => {
   try {
-    const orders = await Order.find({ user: req.user.id }).sort('-createdAt');
+    const orders = await Order.find({ user: req.user.id })
+      .populate('products.product')
+      .sort('-createdAt');
     res.status(200).json({ status: 'success', data: { orders } });
   } catch (err) { next(err); }
 };
 
 exports.getAllOrders = async (req, res, next) => {
   try {
-    const orders = await Order.find().populate('user').sort('-createdAt');
+    const orders = await Order.find()
+      .populate('user')
+      .populate('products.product')
+      .sort('-createdAt');
     res.status(200).json({ status: 'success', data: { orders } });
   } catch (err) { next(err); }
 };
 
 exports.updateOrderStatus = async (req, res, next) => {
   try {
-    const order = await Order.findByIdAndUpdate(req.params.id, { status: req.body.status }, { new: true });
+    const order = await Order.findByIdAndUpdate(req.params.id, { status: req.body.status }, { returnDocument: 'after' });
     res.status(200).json({ status: 'success', data: { order } });
   } catch (err) { next(err); }
 };
@@ -93,7 +101,7 @@ exports.cancelOrder = async (req, res, next) => {
 
 exports.requestRefund = async (req, res, next) => {
   try {
-    const order = await Order.findByIdAndUpdate(req.params.id, { refundStatus: 'requested' }, { new: true });
+    const order = await Order.findByIdAndUpdate(req.params.id, { refundStatus: 'requested' }, { returnDocument: 'after' });
     res.status(200).json({ status: 'success', data: { order } });
   } catch (err) { next(err); }
 };

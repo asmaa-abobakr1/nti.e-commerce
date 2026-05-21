@@ -2,6 +2,20 @@ import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ProductService } from '../../../services/product.service';
 import { FormsModule } from '@angular/forms';
+import { Product, Category, SubCategory } from '../../../models/interfaces';
+
+interface ProductForm {
+  title: string;
+  price: number;
+  desc: string;
+  stock: number;
+  gender: 'boys' | 'girls' | 'unisex';
+  season: string;
+  category: string;
+  subCategory: string;
+  isNewArrival: boolean;
+  isBestSeller: boolean;
+}
 
 @Component({
   selector: 'app-product-management',
@@ -23,6 +37,7 @@ import { FormsModule } from '@angular/forms';
             <th>Category</th>
             <th>Price</th>
             <th>Stock</th>
+            <th>Status</th>
             <th>Actions</th>
           </tr>
         </thead>
@@ -38,6 +53,22 @@ import { FormsModule } from '@angular/forms';
             <td class="fw-bold text-primary">\${{prod.price}}</td>
             <td>{{prod.stock}}</td>
             <td>
+              <div class="d-flex gap-1">
+                <span class="badge rounded-pill cursor-pointer" 
+                      [ngClass]="prod.isNewArrival ? 'bg-primary' : 'bg-light text-dark border'"
+                      (click)="toggleStatus(prod, 'isNewArrival')"
+                      title="Toggle New Arrival">
+                  New
+                </span>
+                <span class="badge rounded-pill cursor-pointer" 
+                      [ngClass]="prod.isBestSeller ? 'bg-secondary' : 'bg-light text-dark border'"
+                      (click)="toggleStatus(prod, 'isBestSeller')"
+                      title="Toggle Best Seller">
+                  Best
+                </span>
+              </div>
+            </td>
+            <td>
               <button class="btn btn-sm btn-light rounded-circle me-2" (click)="editProduct(prod)"><i class="fas fa-edit"></i></button>
               <button class="btn btn-sm btn-light text-danger rounded-circle" (click)="deleteProduct(prod._id)"><i class="fas fa-trash-alt"></i></button>
             </td>
@@ -50,73 +81,85 @@ import { FormsModule } from '@angular/forms';
     <div class="modal fade show d-block" *ngIf="showForm" style="background: rgba(0,0,0,0.5)">
        <div class="modal-dialog modal-lg modal-dialog-centered">
          <div class="modal-content rounded-5 border-0 p-4">
-           <h4 class="fw-bold mb-4">{{editingId ? 'Edit' : 'Add'}} Product</h4>
-           <div class="row g-3">
-             <div class="col-md-6">
-               <label class="small fw-bold">Title</label>
-               <input type="text" class="form-control rounded-pill" [(ngModel)]="currentProd.title">
-             </div>
-             <div class="col-md-6">
-               <label class="small fw-bold">Price</label>
-               <input type="number" class="form-control rounded-pill" [(ngModel)]="currentProd.price">
-             </div>
-             <div class="col-12">
-               <label class="small fw-bold">Description</label>
-               <textarea class="form-control rounded-4" rows="3" [(ngModel)]="currentProd.desc"></textarea>
-             </div>
-             <div class="col-md-4">
-               <label class="small fw-bold">Stock</label>
-               <input type="number" class="form-control rounded-pill" [(ngModel)]="currentProd.stock">
-             </div>
-             <div class="col-md-4">
-               <label class="small fw-bold">Gender</label>
-               <select class="form-select rounded-pill" [(ngModel)]="currentProd.gender">
-                 <option value="boys">Boys</option>
-                 <option value="girls">Girls</option>
-                 <option value="unisex">Unisex</option>
-               </select>
-             </div>
-             <div class="col-md-4">
-               <label class="small fw-bold">Season</label>
-               <input type="text" class="form-control rounded-pill" [(ngModel)]="currentProd.season" placeholder="Summer 2026">
-             </div>
-             <div class="col-md-6">
-               <label class="small fw-bold">Category</label>
-               <select class="form-select rounded-pill" [(ngModel)]="currentProd.category">
-                 <option *ngFor="let cat of categories" [value]="cat._id">{{cat.title}}</option>
-               </select>
-             </div>
-             <div class="col-md-6">
-               <label class="small fw-bold">SubCategory</label>
-               <select class="form-select rounded-pill" [(ngModel)]="currentProd.subCategory">
-                 <option *ngFor="let sub of filteredSubCategories" [value]="sub._id">{{sub.title}}</option>
-               </select>
-             </div>
-             <div class="col-12">
-               <label class="small fw-bold">Product Image (File)</label>
-               <input type="file" class="form-control rounded-pill" (change)="onFileSelected($event)">
-             </div>
-           </div>
-           <div class="d-flex gap-2 mt-4">
-             <button class="btn btn-primary rounded-pill px-5 py-2 fw-bold" (click)="saveProduct()">SAVE PRODUCT</button>
-             <button class="btn btn-light rounded-pill px-5 py-2" (click)="showForm = false">CANCEL</button>
-           </div>
+            <h4 class="fw-bold mb-4">{{editingId ? 'Edit' : 'Add'}} Product</h4>
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label class="small fw-bold">Title</label>
+                <input type="text" class="form-control rounded-pill" [(ngModel)]="currentProd.title">
+              </div>
+              <div class="col-md-6">
+                <label class="small fw-bold">Price</label>
+                <input type="number" class="form-control rounded-pill" [(ngModel)]="currentProd.price">
+              </div>
+              <div class="col-12">
+                <label class="small fw-bold">Description</label>
+                <textarea class="form-control rounded-4" rows="3" [(ngModel)]="currentProd.desc"></textarea>
+              </div>
+              <div class="col-md-4">
+                <label class="small fw-bold">Stock</label>
+                <input type="number" class="form-control rounded-pill" [(ngModel)]="currentProd.stock">
+              </div>
+              <div class="col-md-4">
+                <label class="small fw-bold">Gender</label>
+                <select class="form-select rounded-pill" [(ngModel)]="currentProd.gender">
+                  <option value="boys">Boys</option>
+                  <option value="girls">Girls</option>
+                  <option value="unisex">Unisex</option>
+                </select>
+              </div>
+              <div class="col-md-4">
+                <label class="small fw-bold">Season</label>
+                <input type="text" class="form-control rounded-pill" [(ngModel)]="currentProd.season" placeholder="Summer 2026">
+              </div>
+              <div class="col-md-6">
+                <label class="small fw-bold">Category</label>
+                <select class="form-select rounded-pill" [(ngModel)]="currentProd.category">
+                  <option *ngFor="let cat of categories" [value]="cat._id">{{cat.title}}</option>
+                </select>
+              </div>
+              <div class="col-md-6">
+                <label class="small fw-bold">SubCategory</label>
+                <select class="form-select rounded-pill" [(ngModel)]="currentProd.subCategory">
+                  <option *ngFor="let sub of filteredSubCategories" [value]="sub._id">{{sub.title}}</option>
+                </select>
+              </div>
+               <div class="col-md-6 mt-3">
+                 <div class="form-check form-switch">
+                   <input class="form-check-input" type="checkbox" id="isNewArrival" [(ngModel)]="currentProd.isNewArrival">
+                   <label class="form-check-label fw-bold small" for="isNewArrival">Mark as New Arrival</label>
+                 </div>
+               </div>
+               <div class="col-md-6 mt-3">
+                 <div class="form-check form-switch">
+                   <input class="form-check-input" type="checkbox" id="isBestSeller" [(ngModel)]="currentProd.isBestSeller">
+                   <label class="form-check-label fw-bold small" for="isBestSeller">Mark as Best Seller</label>
+                 </div>
+               </div>
+               <div class="col-12 mt-2">
+                 <label class="small fw-bold">Product Image (File)</label>
+                 <input type="file" class="form-control rounded-pill" (change)="onFileSelected($event)">
+               </div>
+            </div>
+            <div class="d-flex gap-2 mt-4">
+              <button class="btn btn-primary rounded-pill px-5 py-2 fw-bold" (click)="saveProduct()">SAVE PRODUCT</button>
+              <button class="btn btn-light rounded-pill px-5 py-2" (click)="showForm = false">CANCEL</button>
+            </div>
          </div>
        </div>
     </div>
   `
 })
 export class ProductManagementComponent implements OnInit {
-  productService = inject(ProductService);
-  products: any[] = [];
-  categories: any[] = [];
-  subCategories: any[] = [];
+  private productService = inject(ProductService);
+  products: Product[] = [];
+  categories: Category[] = [];
+  subCategories: SubCategory[] = [];
   
   showForm = false;
   editingId: string | null = null;
   selectedFile: File | null = null;
 
-  currentProd: any = {
+  currentProd: ProductForm = {
     title: '',
     price: 0,
     desc: '',
@@ -124,17 +167,25 @@ export class ProductManagementComponent implements OnInit {
     gender: 'unisex',
     season: '',
     category: '',
-    subCategory: ''
+    subCategory: '',
+    isNewArrival: false,
+    isBestSeller: false
   };
 
   ngOnInit() {
     this.load();
     this.productService.getCategories().subscribe(res => this.categories = res.data.categories);
-    this.productService.getSubCategories().subscribe(res => this.subCategories = res.data.subCategories);
+    this.productService.getSubCategories().subscribe(res => {
+       // Backend sends 'subcategories' key (lowercase) based on my service update
+       this.subCategories = (res.data as any).subcategories || (res.data as any).subCategories;
+    });
   }
 
-  get filteredSubCategories() {
-    return this.subCategories.filter(s => s.category?._id === this.currentProd.category || s.category === this.currentProd.category);
+  get filteredSubCategories(): SubCategory[] {
+    return this.subCategories.filter(s => {
+       const catId = typeof s.category === 'string' ? s.category : s.category._id;
+       return catId === this.currentProd.category;
+    });
   }
 
   load() {
@@ -147,12 +198,12 @@ export class ProductManagementComponent implements OnInit {
     this.currentProd = {
       title: '', price: 0, desc: '', stock: 0,
       gender: 'unisex', season: '', category: this.categories[0]?._id || '',
-      subCategory: ''
+      subCategory: '', isNewArrival: false, isBestSeller: false
     };
     this.showForm = true;
   }
 
-  editProduct(prod: any) {
+  editProduct(prod: Product) {
     this.editingId = prod._id;
     this.selectedFile = null;
     this.currentProd = {
@@ -161,21 +212,27 @@ export class ProductManagementComponent implements OnInit {
       desc: prod.desc,
       stock: prod.stock,
       gender: prod.gender,
-      season: prod.season,
-      category: prod.category?._id || prod.category,
-      subCategory: prod.subCategory?._id || prod.subCategory
+      season: prod.season || '',
+      category: prod.category?._id || '',
+      subCategory: prod.subCategory?._id || '',
+      isNewArrival: prod.isNewArrival || false,
+      isBestSeller: prod.isBestSeller || false
     };
     this.showForm = true;
   }
 
-  onFileSelected(event: any) {
-    this.selectedFile = event.target.files[0];
+  onFileSelected(event: Event) {
+    const input = event.target as HTMLInputElement;
+    if (input.files && input.files.length > 0) {
+      this.selectedFile = input.files[0];
+    }
   }
 
   saveProduct() {
     const formData = new FormData();
-    Object.keys(this.currentProd).forEach(key => {
-      formData.append(key, this.currentProd[key]);
+    const prodObj = this.currentProd as any;
+    Object.keys(prodObj).forEach(key => {
+      formData.append(key, prodObj[key].toString());
     });
     if (this.selectedFile) {
       formData.append('img', this.selectedFile);
@@ -198,5 +255,15 @@ export class ProductManagementComponent implements OnInit {
     if (confirm('Delete product?')) {
       this.productService.deleteProduct(id).subscribe(() => this.load());
     }
+  }
+
+  toggleStatus(prod: Product, field: 'isNewArrival' | 'isBestSeller') {
+    const newValue = !prod[field];
+    const formData = new FormData();
+    formData.append(field, newValue.toString());
+    
+    this.productService.updateProduct(prod._id, formData).subscribe(() => {
+      prod[field] = newValue;
+    });
   }
 }

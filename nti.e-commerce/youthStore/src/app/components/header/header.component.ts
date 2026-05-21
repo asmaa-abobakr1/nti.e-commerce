@@ -1,9 +1,11 @@
-import { Component, inject } from '@angular/core';
+import { Component, OnInit, inject, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { CartService } from '../../services/cart.service';
 import { SettingsService } from '../../services/settings.service';
+import { ProductService } from '../../services/product.service';
+import { Category, SubCategory, Settings } from '../../models/interfaces';
 
 @Component({
   selector: 'app-header',
@@ -12,16 +14,59 @@ import { SettingsService } from '../../services/settings.service';
   templateUrl: './header.component.html',
   styleUrls: ['./header.component.css']
 })
-export class HeaderComponent {
-  authService = inject(AuthService);
-  cartService = inject(CartService);
-  settingsService = inject(SettingsService);
+export class HeaderComponent implements OnInit {
+  public authService = inject(AuthService);
+  public cartService = inject(CartService);
+  private settingsService = inject(SettingsService);
+  private productService = inject(ProductService);
   
-  settings: any = null;
+  settings: Settings | null = null;
+  categories: Category[] = [];
+  subCategories: SubCategory[] = [];
 
-  constructor() {
+  sidebarOpen = false;
+  expandedCat: string | null = null;
+
+  ngOnInit() {
     this.settingsService.getSettings().subscribe(res => {
       this.settings = res.data.settings;
     });
+
+    this.productService.getCategories().subscribe(res => {
+      this.categories = res.data.categories;
+    });
+
+    this.productService.getSubCategories().subscribe(res => {
+      this.subCategories = (res.data as any).subcategories || (res.data as any).subCategories;
+    });
+  }
+
+  getSubsForCat(catId: string): SubCategory[] {
+    return this.subCategories.filter(s => {
+      const id = typeof s.category === 'string' ? s.category : s.category?._id;
+      return id === catId;
+    });
+  }
+
+  toggleSidebar() {
+    this.sidebarOpen = !this.sidebarOpen;
+    document.body.style.overflow = this.sidebarOpen ? 'hidden' : '';
+  }
+
+  closeSidebar() {
+    this.sidebarOpen = false;
+    this.expandedCat = null;
+    document.body.style.overflow = '';
+  }
+
+  toggleCategory(event: Event, catId: string) {
+    event.preventDefault();
+    event.stopPropagation();
+    this.expandedCat = this.expandedCat === catId ? null : catId;
+  }
+
+  @HostListener('document:keydown.escape')
+  onEscapeKey() {
+    if (this.sidebarOpen) this.closeSidebar();
   }
 }

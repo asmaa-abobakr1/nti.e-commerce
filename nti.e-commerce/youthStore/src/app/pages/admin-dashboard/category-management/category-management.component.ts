@@ -2,6 +2,7 @@ import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ProductService } from '../../../services/product.service';
 import { FormsModule } from '@angular/forms';
+import { Category } from '../../../models/interfaces';
 
 @Component({
   selector: 'app-category-management',
@@ -64,11 +65,11 @@ import { FormsModule } from '@angular/forms';
   `
 })
 export class CategoryManagementComponent implements OnInit {
-  productService = inject(ProductService);
-  categories: any[] = [];
+  private productService = inject(ProductService);
+  categories: Category[] = [];
   showForm = false;
   editingId: string | null = null;
-  currentCat = { title: '', isActive: true };
+  currentCat: Partial<Category> = { title: '', isActive: true };
 
   ngOnInit() {
     this.load();
@@ -84,7 +85,7 @@ export class CategoryManagementComponent implements OnInit {
     this.showForm = true;
   }
 
-  editCategory(cat: any) {
+  editCategory(cat: Category) {
     this.editingId = cat._id;
     this.currentCat = { ...cat };
     this.showForm = true;

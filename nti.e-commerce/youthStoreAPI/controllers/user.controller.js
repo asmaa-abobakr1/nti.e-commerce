@@ -3,7 +3,23 @@ const AppError = require('../utilites/appError.uti');
 
 exports.getMe = async (req, res, next) => {
   try {
-    const user = await User.findById(req.user.id);
+    console.log('Fetching profile for user ID:', req.user.id);
+    const user = await User.findById(req.user.id).populate('cart.product');
+    console.log('User found:', !!user);
+    
+    // Check for price changes
+    let isChanged = false;
+    user.cart.forEach(item => {
+      if (item.product && item.product.price !== item.price) {
+        item.isPriceChanged = true;
+        isChanged = true;
+      }
+    });
+
+    if (isChanged) {
+      await user.save();
+    }
+
     res.status(200).json({ status: 'success', data: { user } });
   } catch (err) { next(err); }
 };
@@ -16,7 +32,7 @@ exports.updateMe = async (req, res, next) => {
     delete filteredBody.role;
 
     const updatedUser = await User.findByIdAndUpdate(req.user.id, filteredBody, {
-      new: true,
+      returnDocument: 'after',
       runValidators: true
     });
 
@@ -102,7 +118,7 @@ exports.createUser = async (req, res, next) => {
 exports.updateUser = async (req, res, next) => {
   try {
     const user = await User.findByIdAndUpdate(req.params.id, req.body, {
-      new: true,
+      returnDocument: 'after',
       runValidators: true
     });
     if (!user) return next(new AppError('No user found with that ID', 404));

@@ -1,6 +1,7 @@
 import { Component, Input, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { trigger, transition, style, animate } from '@angular/animations';
+import { Testimonial } from '../../models/interfaces';
 
 @Component({
   selector: 'app-testimonial-slider',
@@ -21,22 +22,25 @@ import { trigger, transition, style, animate } from '@angular/animations';
   ]
 })
 export class TestimonialSliderComponent implements OnInit, OnDestroy {
-  @Input() testimonials: any[] = [];
+  @Input() testimonials: Testimonial[] = [];
   
   currentIndex: number = 0;
   itemsPerView: number = 1;
-  autoPlayInterval: any;
+  private autoPlayInterval: number | null = null;
 
   ngOnInit() {
     this.startAutoPlay();
-    window.addEventListener('resize', () => this.updateItemsPerView());
+    window.addEventListener('resize', this.onResize.bind(this));
     this.updateItemsPerView();
   }
 
   ngOnDestroy() {
-    if (this.autoPlayInterval) {
-      clearInterval(this.autoPlayInterval);
-    }
+    this.stopAutoPlay();
+    window.removeEventListener('resize', this.onResize.bind(this));
+  }
+
+  onResize() {
+    this.updateItemsPerView();
   }
 
   updateItemsPerView() {
@@ -51,20 +55,22 @@ export class TestimonialSliderComponent implements OnInit, OnDestroy {
   }
 
   startAutoPlay() {
-    this.autoPlayInterval = setInterval(() => {
+    this.stopAutoPlay();
+    this.autoPlayInterval = window.setInterval(() => {
       this.nextSlide();
-    }, 5000);
+    }, 3000);
   }
 
   stopAutoPlay() {
-    if (this.autoPlayInterval) {
+    if (this.autoPlayInterval !== null) {
       clearInterval(this.autoPlayInterval);
+      this.autoPlayInterval = null;
     }
   }
 
   nextSlide() {
-    const maxIndex = Math.max(0, this.testimonials.length - this.itemsPerView);
-    this.currentIndex = this.currentIndex >= maxIndex ? 0 : this.currentIndex + 1;
+    const max = this.testimonials.length - this.itemsPerView;
+    this.currentIndex = this.currentIndex >= max ? 0 : this.currentIndex + 1;
   }
 
   prevSlide() {
@@ -85,5 +91,9 @@ export class TestimonialSliderComponent implements OnInit, OnDestroy {
   getDots() {
     const maxIndex = Math.max(0, this.testimonials.length - this.itemsPerView);
     return Array.from({ length: maxIndex + 1 }, (_, i) => i);
+  }
+
+  getStarsArray(stars: number | undefined) {
+    return Array(Math.floor(stars || 5)).fill(0);
   }
 }

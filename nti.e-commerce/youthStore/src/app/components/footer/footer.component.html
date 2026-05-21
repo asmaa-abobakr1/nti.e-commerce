@@ -1,49 +1,51 @@
-<footer class="bg-dark text-white pt-5 pb-4">
-  <div class="container text-center text-md-start">
-    <div class="row">
-      <div class="col-md-3 col-lg-3 col-xl-3 mx-auto mt-3">
-        <h5 class="text-uppercase mb-4 font-weight-bold text-primary">YOUTH<span class="text-secondary">STORE</span></h5>
-        <p>The ultimate destination for casual youth fashion. Stay trendy, stay vibrant with our latest collections.</p>
+<footer class="bg-dark text-white pt-5 pb-4 position-relative overflow-hidden">
+  <div class="mesh-gradient opacity-10"></div>
+  <div class="container position-relative">
+    <div class="row g-4">
+      <div class="col-lg-4 col-md-6">
+        <h4 class="fw-bolder mb-4"><span class="text-primary">{{ (settings?.siteName || 'YOUTH').split(' ')[0] }}</span><span class="text-white">{{ (settings?.siteName || 'STORE').split(' ')[1] || '' }}</span></h4>
+        <p class="text-gray opacity-75 mb-4">{{ settings?.footerAboutText || "The ultimate destination for casual youth fashion. Stay trendy, stay vibrant with our latest collections and exclusive street style drops." }}</p>
+        <div class="d-flex gap-3">
+          <a [href]="settings?.socialLinks?.facebook || '#'" class="btn btn-outline-light rounded-circle p-2 shadow-sm" style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;"><i class="fab fa-facebook-f"></i></a>
+          <a [href]="settings?.socialLinks?.instagram || '#'" class="btn btn-outline-light rounded-circle p-2 shadow-sm" style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;"><i class="fab fa-instagram"></i></a>
+          <a [href]="settings?.socialLinks?.twitter || '#'" class="btn btn-outline-light rounded-circle p-2 shadow-sm" style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;"><i class="fab fa-twitter"></i></a>
+        </div>
       </div>
 
-      <div class="col-md-2 col-lg-2 col-xl-2 mx-auto mt-3">
-        <h5 class="text-uppercase mb-4 font-weight-bold text-primary">Shop</h5>
-        <p><a routerLink="/shop" class="text-white text-decoration-none">New Arrivals</a></p>
-        <p><a routerLink="/shop" class="text-white text-decoration-none">Best Sellers</a></p>
-        <p><a routerLink="/shop" class="text-white text-decoration-none">Boys Collection</a></p>
-        <p><a routerLink="/shop" class="text-white text-decoration-none">Girls Collection</a></p>
+      <div class="col-lg-2 col-md-6">
+        <h6 class="text-uppercase fw-bold mb-4 text-primary">Quick Links</h6>
+        <ul class="list-unstyled">
+          <li class="mb-2"><a routerLink="/new" class="text-gray text-decoration-none hover-white">New Arrivals</a></li>
+          <li class="mb-2"><a routerLink="/best" class="text-gray text-decoration-none hover-white">Best Sellers</a></li>
+          <li class="mb-2"><a routerLink="/shop" class="text-gray text-decoration-none hover-white">Collections</a></li>
+        </ul>
       </div>
 
-      <div class="col-md-3 col-lg-2 col-xl-2 mx-auto mt-3">
-        <h5 class="text-uppercase mb-4 font-weight-bold text-primary">Support</h5>
-        <p><a href="#" class="text-white text-decoration-none">Terms & Conditions</a></p>
-        <p><a href="#" class="text-white text-decoration-none">Shipping Policy</a></p>
-        <p><a href="#" class="text-white text-decoration-none">Refund Policy</a></p>
-        <p><a href="#" class="text-white text-decoration-none">FAQ</a></p>
+      <div class="col-lg-2 col-md-6">
+        <h6 class="text-uppercase fw-bold mb-4 text-primary">Support</h6>
+        <ul class="list-unstyled">
+          <li class="mb-2"><a routerLink="/about" class="text-gray text-decoration-none hover-white">About Us</a></li>
+          <li class="mb-2"><a routerLink="/contact" class="text-gray text-decoration-none hover-white">Contact Us</a></li>
+          <li class="mb-2"><a routerLink="/terms" class="text-gray text-decoration-none hover-white">Terms</a></li>
+          <li class="mb-2"><a routerLink="/privacy" class="text-gray text-decoration-none hover-white">Privacy</a></li>
+        </ul>
       </div>
 
-      <div class="col-md-4 col-lg-3 col-xl-3 mx-auto mt-3">
-        <h5 class="text-uppercase mb-4 font-weight-bold text-primary">Contact</h5>
-        <p><i class="fas fa-home me-3"></i> Cairo, Egypt</p>
-        <p><i class="fas fa-envelope me-3"></i> info&#64;youthstore.com</p>
-        <p><i class="fas fa-phone me-3"></i> +20 123 456 789</p>
-        <div class="mt-4">
-          <a href="#" class="text-white me-4"><i class="fab fa-facebook-f"></i></a>
-          <a href="#" class="text-white me-4"><i class="fab fa-instagram"></i></a>
-          <a href="#" class="text-white me-4"><i class="fab fa-tiktok"></i></a>
+      <div class="col-lg-4 col-md-6">
+        <h6 class="text-uppercase fw-bold mb-4 text-primary">Newsletter</h6>
+        <p class="text-gray small mb-4">Subscribe to get special offers and once-in-a-lifetime deals.</p>
+        <div class="input-group mb-3">
+          <input type="text" class="form-control bg-transparent border-secondary text-white rounded-start-pill px-4" placeholder="Email Address">
+          <button class="btn btn-primary rounded-end-pill px-4" type="button">Join</button>
         </div>
       </div>
     </div>
 
-    <hr class="mb-4 mt-5">
-    <div class="row align-items-center">
-      <div class="col-md-7 col-lg-8">
-        <p>Copyright &copy; 2026 All rights reserved by:
-          <a href="#" style="text-decoration: none;">
-            <strong class="text-primary">YouthStore</strong>
-          </a>
-        </p>
-      </div>
+    <hr class="my-5 opacity-10">
+    
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-center gap-3">
+      <p class="text-gray small mb-0">© 2026 {{ settings?.siteName || 'YouthStore' }}. All rights reserved.</p>
+      
     </div>
   </div>
 </footer>

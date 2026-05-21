@@ -1,10 +1,11 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { RouterModule } from '@angular/router';
+import { Router, RouterModule, ActivatedRoute } from '@angular/router';
 import { ProductService } from '../../services/product.service';
 import { CartService } from '../../services/cart.service';
 import { ProductCardComponent } from '../../components/product-card/product-card.component';
+import { Product, Category, SubCategory } from '../../models/interfaces';
 
 @Component({
   selector: 'app-shop',
@@ -14,31 +15,45 @@ import { ProductCardComponent } from '../../components/product-card/product-card
   styleUrls: ['./shop.component.css']
 })
 export class ShopComponent implements OnInit {
-  productService = inject(ProductService);
-  cartService = inject(CartService);
+  private productService = inject(ProductService);
+  private cartService = inject(CartService);
+  private route = inject(ActivatedRoute);
 
-  products: any[] = [];
-  categories: any[] = [];
+  products: Product[] = [];
+  categories: Category[] = [];
+  subCategories: SubCategory[] = [];
+  filteredSubCategories: SubCategory[] = [];
   
   filters = {
     name: '',
     category: '',
-    gender: '',
+    subCategory: '',
     minPrice: 0,
-    maxPrice: 1000
+    maxPrice: 1000,
+    sort: '-createdAt'
   };
 
   ngOnInit() {
-    this.loadProducts();
+    this.route.queryParams.subscribe(params => {
+      if (params['category']) this.filters.category = params['category'];
+      if (params['subCategory']) this.filters.subCategory = params['subCategory'];
+      this.loadProducts();
+    });
     this.loadCategories();
+    this.loadSubCategories();
   }
 
   loadProducts() {
-    const apiFilters: any = {};
-    if (this.filters.name) apiFilters.title = { $regex: this.filters.name, $options: 'i' };
-    if (this.filters.category) apiFilters.category = this.filters.category;
-    if (this.filters.gender) apiFilters.gender = this.filters.gender;
-    apiFilters.price = { gte: this.filters.minPrice, lte: this.filters.maxPrice };
+    const apiFilters: Record<string, string | number | boolean> = {};
+    if (this.filters.name) {
+      apiFilters['title[regex]'] = this.filters.name;
+      apiFilters['title[options]'] = 'i';
+    }
+    if (this.filters.category) apiFilters['category'] = this.filters.category;
+    if (this.filters.subCategory) apiFilters['subCategory'] = this.filters.subCategory;
+    apiFilters['price[gte]'] = Number(this.filters.minPrice);
+    apiFilters['price[lte]'] = Number(this.filters.maxPrice);
+    apiFilters['sort'] = this.filters.sort;
 
     this.productService.getProducts(apiFilters).subscribe(res => {
       this.products = res.data.products;
@@ -51,11 +66,43 @@ export class ShopComponent implements OnInit {
     });
   }
 
+  loadSubCategories() {
+    this.productService.getSubCategories().subscribe(res => {
+      // Backend renamed to subcategories in interface
+      this.subCategories = (res.data as any).subcategories || (res.data as any).subCategories;
+      this.updateFilteredSubCategories();
+    });
+  }
+
+  updateFilteredSubCategories() {
+    if (!this.filters.category) {
+      this.filteredSubCategories = this.subCategories;
+    } else {
+      this.filteredSubCategories = this.subCategories.filter(s => {
+        const catId = typeof s.category === 'string' ? s.category : s.category?._id;
+        return catId === this.filters.category;
+      });
+    }
+  }
+
   applyFilters() {
+    this.updateFilteredSubCategories();
     this.loadProducts();
   }
 
-  addToCart(product: any) {
+  addToCart(product: Product) {
     this.cartService.addToCart(product);
+  }
+
+  resetFilters() {
+    this.filters = {
+      name: '',
+      category: '',
+      subCategory: '',
+      minPrice: 0,
+      maxPrice: 1000,
+      sort: '-createdAt'
+    };
+    this.applyFilters();
   }
 }

@@ -2,6 +2,8 @@ import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
+import { Observable } from 'rxjs';
+import { map, take } from 'rxjs/operators';
 import { CartService } from '../../services/cart.service';
 import { OrderService } from '../../services/order.service';
 import { UserService } from '../../services/user.service';
@@ -25,22 +27,33 @@ export class CheckoutComponent implements OnInit {
   showAddressForm = false;
   error: string = '';
 
+  total$: Observable<number> = this.cartService.cart$.pipe(
+    map(cart => cart.reduce((acc, item) => acc + (item.price * item.count), 0))
+  );
+
   ngOnInit() {
     this.userService.getMe().subscribe(res => {
       this.user = res.data.user;
+      if (this.user.role === 'admin') {
+        this.error = 'Admins cannot place orders.';
+      }
       const defaultAddr = this.user.addresses.find((a: any) => a.isDefault);
       if (defaultAddr) this.selectedAddressId = defaultAddr._id;
     });
   }
 
   placeOrder() {
+    if (this.user?.role === 'admin') {
+      this.error = 'Admins cannot place orders.';
+      return;
+    }
     const address = this.user.addresses.find((a: any) => a._id === this.selectedAddressId);
     if (!address) {
       this.error = 'Please select a shipping address';
       return;
     }
 
-    this.cartService.cart$.subscribe(cart => {
+    this.cartService.cart$.pipe(take(1)).subscribe(cart => {
       const orderData = {
         products: cart.map(item => ({ product: item.product._id, count: item.count })),
         address: `${address.alias}: ${address.details} (Tel: ${address.phone})`,
@@ -54,7 +67,7 @@ export class CheckoutComponent implements OnInit {
         },
         error: (err) => this.error = err.error.message || 'Order failed'
       });
-    }).unsubscribe();
+    });
   }
 
   saveNewAddress() {

@@ -1,17 +1,21 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
 import { ProductService } from '../../services/product.service';
 import { TestimonialService } from '../../services/testimonial.service';
 import { SettingsService } from '../../services/settings.service';
+import { AuthService } from '../../services/auth.service';
+import { FormsModule } from '@angular/forms';
 import { CartService } from '../../services/cart.service';
 import { ProductCardComponent } from '../../components/product-card/product-card.component';
 import { TestimonialSliderComponent } from '../../components/testimonial-slider/testimonial-slider.component';
+import { MarketingSliderComponent } from '../../components/marketing-slider/marketing-slider.component';
+import { RouterModule } from '@angular/router';
+import { Product, Testimonial, Settings } from '../../models/interfaces';
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [CommonModule, RouterModule, ProductCardComponent, TestimonialSliderComponent],
+  imports: [CommonModule, RouterModule, FormsModule, ProductCardComponent, TestimonialSliderComponent, MarketingSliderComponent],
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.css']
 })
@@ -20,11 +24,16 @@ export class HomeComponent implements OnInit {
   testimonialService = inject(TestimonialService);
   settingsService = inject(SettingsService);
   cartService = inject(CartService);
+  authService = inject(AuthService);
 
-  newArrivals: any[] = [];
-  bestSellers: any[] = [];
-  testimonials: any[] = [];
-  settings: any = null;
+  newArrivals: Product[] = [];
+  bestSellers: Product[] = [];
+  testimonials: Testimonial[] = [];
+  settings: Settings | null = null;
+  
+  newReview = { name: '', content: '', stars: 5 };
+  reviewSubmitted = false;
+  reviewError = '';
 
   ngOnInit() {
     this.loadProducts();
@@ -39,11 +48,11 @@ export class HomeComponent implements OnInit {
   }
 
   loadProducts() {
-    this.productService.getProducts({ limit: 6, sort: '-createdAt' }).subscribe(res => {
+    this.productService.getProducts({ isNewArrival: true, limit: 6 }).subscribe((res) => {
       this.newArrivals = res.data.products;
     });
 
-    this.productService.getProducts({ limit: 4, sort: '-soldCount' }).subscribe(res => {
+    this.productService.getProducts({ isBestSeller: true, limit: 4 }).subscribe((res) => {
       this.bestSellers = res.data.products;
     });
   }
@@ -54,7 +63,33 @@ export class HomeComponent implements OnInit {
     });
   }
 
-  addToCart(product: any) {
+  addToCart(product: Product) {
     this.cartService.addToCart(product);
+  }
+
+  submitReview() {
+    if (!this.newReview.name || !this.newReview.content) {
+      this.reviewError = 'Please fill all fields.';
+      return;
+    }
+
+    const reviewData: Partial<Testimonial> = { ...this.newReview };
+    const user = this.authService.user$ as any;
+    if (this.authService.isLoggedIn()) {
+      // In a real app, we'd get the ID from the decoded token
+      // For now, let's assume it's available or handled by the backend if we add protect middleware
+      // But since we want to allow guests, we'll just send it if we have it
+    }
+
+    this.testimonialService.submit(reviewData).subscribe({
+      next: () => {
+        this.reviewSubmitted = true;
+        this.newReview = { name: '', content: '', stars: 5 };
+        this.reviewError = '';
+      },
+      error: () => {
+        this.reviewError = 'Failed to submit review.';
+      }
+    });
   }
 }

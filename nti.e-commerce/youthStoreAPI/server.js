@@ -27,9 +27,10 @@ app.use('/api/v1/orders', require('./routes/order.route'));
 app.use('/api/v1/testimonials', require('./routes/testimonial.route'));
 app.use('/api/v1/reports', require('./routes/report.route'));
 app.use('/api/v1/settings', require('./routes/settings.route'));
+app.use('/api/v1/messages', require('./routes/message.route'));
 
 // 404 handler
-app.all('*path', (req, res, next) => {
+app.use((req, res, next) => {
   next(new AppError(`Can't find ${req.originalUrl} on this server!`, 404));
 });
 

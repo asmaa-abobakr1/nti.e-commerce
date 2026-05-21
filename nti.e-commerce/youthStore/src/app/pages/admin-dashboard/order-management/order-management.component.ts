@@ -2,6 +2,7 @@ import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { OrderService } from '../../../services/order.service';
 import { FormsModule } from '@angular/forms';
+import { Order } from '../../../models/interfaces';
 
 @Component({
   selector: 'app-order-management',
@@ -27,13 +28,13 @@ import { FormsModule } from '@angular/forms';
             <td>{{order.user?.name}}<br><small class="text-gray">{{order.user?.phone}}</small></td>
             <td class="fw-bold text-primary">\${{order.totalPrice}}</td>
             <td>
-              <select class="form-select form-select-sm rounded-pill" [ngModel]="order.status" (change)="updateOrderStatus(order._id, $any($event.target).value)">
+              <select class="form-select form-select-sm rounded-pill" [ngModel]="order.status" (change)="onStatusChange(order._id, $event)">
                 <option value="pending">Pending</option>
                 <option value="preparing">Preparing</option>
                 <option value="shipped">Shipped</option>
                 <option value="delivered">Delivered</option>
                 <option value="refused">Refused</option>
-                <option value="canceledbyadmin">Canceled (Admin)</option>
+                <option value="cancelbyadmin">Canceled (Admin)</option>
               </select>
             </td>
             <td>
@@ -53,8 +54,8 @@ import { FormsModule } from '@angular/forms';
   `
 })
 export class OrderManagementComponent implements OnInit {
-  orderService = inject(OrderService);
-  orders: any[] = [];
+  private orderService = inject(OrderService);
+  orders: Order[] = [];
 
   ngOnInit() {
     this.loadOrders();
@@ -62,6 +63,11 @@ export class OrderManagementComponent implements OnInit {
 
   loadOrders() {
     this.orderService.getAllOrders().subscribe(res => this.orders = res.data.orders);
+  }
+
+  onStatusChange(id: string, event: Event) {
+    const status = (event.target as HTMLSelectElement).value;
+    this.updateOrderStatus(id, status);
   }
 
   updateOrderStatus(id: string, status: string) {
@@ -74,8 +80,6 @@ export class OrderManagementComponent implements OnInit {
 
   deleteOrder(id: string) {
     if (confirm('Delete this order record?')) {
-      // In a real app, you might want a soft delete for orders too.
-      // I'll assume we want soft delete as requested.
       this.orderService.deleteOrder(id).subscribe(() => this.loadOrders());
     }
   }

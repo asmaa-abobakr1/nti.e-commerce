@@ -1,17 +1,88 @@
 <div class="container py-5">
   <div class="d-flex justify-content-between align-items-center mb-5">
     <div class="d-flex justify-content-between align-items-center mb-4">
-      <h2 class="fw-bolder mb-0">My <span class="text-primary">Orders</span></h2>
+      <h2 class="fw-bolder mb-0">My <span class="text-primary">Profile</span></h2>
       <a routerLink="/admin" class="btn btn-danger rounded-pill px-4 py-2 fw-bold ms-3" *ngIf="authService.isAdmin()">
         <i class="fas fa-lock me-2"></i>Admin Dashboard
       </a>
     </div>
     <div class="d-flex gap-3">
-      <button class="btn btn-outline-primary rounded-pill px-4" (click)="loadOrders()">
+      <button class="btn btn-primary rounded-pill px-4" (click)="isEditingProfile = !isEditingProfile">
+        <i class="fas fa-user-edit me-2"></i>Account Settings
+      </button>
+      <button class="btn btn-outline-primary rounded-pill px-4" (click)="loadOrders(); loadAddresses()">
         <i class="fas fa-sync-alt me-2"></i>Refresh
       </button>
     </div>
   </div>
+
+  <div class="card glass-morphism p-4 rounded-5 border-0 shadow-sm mb-5" *ngIf="isEditingProfile">
+    <h4 class="fw-bold mb-4">Edit Profile</h4>
+    <div class="row g-3">
+      <div class="col-md-6">
+        <label class="small fw-bold">Full Name</label>
+        <input type="text" class="form-control rounded-pill" [(ngModel)]="userData.name">
+      </div>
+      <div class="col-md-6">
+        <label class="small fw-bold">Email Address</label>
+        <input type="email" class="form-control rounded-pill" [(ngModel)]="userData.email">
+      </div>
+      <div class="col-12 mt-4">
+        <button class="btn btn-primary rounded-pill px-5" (click)="updateProfile()">Save Changes</button>
+        <button class="btn btn-light rounded-pill px-4 ms-2" (click)="isEditingProfile = false">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="row mb-5" *ngIf="!authService.isAdmin()">
+    <div class="col-12">
+      <h4 class="fw-bold mb-3">Addresses</h4>
+      <div class="row g-3">
+        <div class="col-md-4" *ngFor="let addr of addresses">
+          <div class="card rounded-4 border p-3 shadow-sm" [ngClass]="{'border-primary bg-light': addr.isDefault}">
+            <div class="d-flex justify-content-between align-items-start">
+              <span class="badge bg-primary rounded-pill mb-2">{{addr.alias}} <span *ngIf="addr.isDefault">(Default)</span></span>
+              <div>
+                <button class="btn btn-sm btn-link text-warning p-0 me-2" *ngIf="!addr.isDefault" (click)="setDefaultAddress(addr._id)" title="Set Default"><i class="fas fa-star"></i></button>
+                <button class="btn btn-sm btn-link text-danger p-0" (click)="deleteAddress(addr._id)"><i class="fas fa-trash"></i></button>
+              </div>
+            </div>
+            <p class="mb-1 small">{{addr.details}}</p>
+            <small class="text-gray"><i class="fas fa-phone me-1"></i>{{addr.phone}}</small>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="card rounded-4 border border-dashed p-3 h-100 d-flex align-items-center justify-content-center cursor-pointer" (click)="showAddressForm = !showAddressForm">
+            <div class="text-center text-primary">
+              <i class="fas fa-plus fs-3 mb-2"></i>
+              <h6 class="mb-0">Add New Address</h6>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="card mt-3 rounded-4 p-4 border-0 shadow-sm bg-white" *ngIf="showAddressForm">
+        <h6 class="fw-bold mb-3">New Address</h6>
+        <div class="row g-3">
+          <div class="col-md-4">
+            <input type="text" class="form-control rounded-pill" [(ngModel)]="newAddress.alias" placeholder="Alias (e.g. Home, Work)">
+          </div>
+          <div class="col-md-4">
+            <input type="text" class="form-control rounded-pill" [(ngModel)]="newAddress.phone" placeholder="Phone Number">
+          </div>
+          <div class="col-md-12">
+            <input type="text" class="form-control rounded-pill" [(ngModel)]="newAddress.details" placeholder="Full Address Details">
+          </div>
+          <div class="col-12">
+            <button class="btn btn-primary rounded-pill px-4" (click)="addAddress()">Save Address</button>
+            <button class="btn btn-light rounded-pill px-4 ms-2" (click)="showAddressForm = false">Cancel</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <h4 class="fw-bold mb-3">Order History</h4>
 
   <div class="row g-4">
     <div class="col-12" *ngFor="let order of orders">
@@ -54,9 +125,9 @@
         <div class="mt-4 pt-4 border-top">
           <div class="d-flex gap-3 overflow-auto">
             <div class="bg-light p-2 rounded-4 d-flex align-items-center gap-2" *ngFor="let item of order.products" style="min-width: 200px;">
-              <img [src]="item.product.img" width="50" height="50" class="rounded-3" style="object-fit: cover;">
+              <img [src]="item.product?.img || 'https://via.placeholder.com/50'" width="50" height="50" class="rounded-3" style="object-fit: cover;">
               <div class="flex-grow-1">
-                <h6 class="small fw-bold mb-0 text-truncate" style="max-width: 120px;">{{item.product.title}}</h6>
+                <h6 class="small fw-bold mb-0 text-truncate" style="max-width: 120px;">{{item.product?.title || 'Product Removed'}}</h6>
                 <small class="text-gray">{{item.count}} x ${{item.price}}</small>
               </div>
             </div>
