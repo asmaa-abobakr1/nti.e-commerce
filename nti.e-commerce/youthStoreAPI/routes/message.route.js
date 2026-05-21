@@ -1,6 +1,6 @@
 const express = require('express');
 const messageController = require('../controllers/message.controller');
-const authMiddleware = require('../middlewares/auth.middleware');
+const authMiddleware = require('../middelwares/auth.middelware');
 
 const router = express.Router();
 

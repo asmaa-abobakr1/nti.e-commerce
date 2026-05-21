@@ -1,10 +1,10 @@
 import { Component, OnInit, inject, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
-import { AuthService } from '../../services/auth.service';
-import { CartService } from '../../services/cart.service';
+import { AuthService } from '../../core/service/auth-service';
+import { CartService } from '../../core/service/cart-service';
 import { SettingsService } from '../../services/settings.service';
-import { ProductService } from '../../services/product.service';
+import { ProductService } from '../../core/service/product-service';
 import { Category, SubCategory, Settings } from '../../models/interfaces';
 
 @Component({
