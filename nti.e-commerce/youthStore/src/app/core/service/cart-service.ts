@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { BehaviorSubject, Observable, map } from 'rxjs';
 import { AuthService } from './auth-service';
 import { CartItem } from '../models/cart.model';
 import { Product } from '../models/product.model';
@@ -17,6 +17,9 @@ export class CartService {
 
   private cartSubject = new BehaviorSubject<CartItem[]>([]);
   cart$ = this.cartSubject.asObservable();
+  cartCount$ = this.cart$.pipe(
+    map(cart => cart.reduce((total, item) => total + item.count, 0))
+  );
 
   constructor() {
     this.loadCart();
@@ -32,19 +35,24 @@ export class CartService {
   private loadCart() {
     const savedCart = localStorage.getItem('cart');
     if (savedCart) {
-      this.cartSubject.next(JSON.parse(savedCart));
+      try {
+        this.cartSubject.next(this.normalizeCart(JSON.parse(savedCart)));
+      } catch {
+        localStorage.removeItem('cart');
+        this.cartSubject.next([]);
+      }
     }
   }
 
   private fetchUserCart() {
     this.http.get<ApiResponse<{ user: { cart: CartItem[] } }>>(`${this.userUrl}/me`).subscribe((res) => {
-      this.cartSubject.next(res.data.user.cart || []);
+      this.cartSubject.next(this.normalizeCart(res.data.user.cart));
     });
   }
 
   addToCart(product: Product, count: number = 1) {
     const currentCart = [...this.cartSubject.value];
-    const existingItem = currentCart.find(item => item.product._id === product._id);
+    const existingItem = currentCart.find(item => this.getProductId(item.product) === product._id);
 
     if (existingItem) {
       existingItem.count += count;
@@ -62,7 +70,7 @@ export class CartService {
 
   updateCount(productId: string, count: number) {
     const currentCart = [...this.cartSubject.value];
-    const item = currentCart.find(i => i.product._id === productId);
+    const item = currentCart.find(i => this.getProductId(i.product) === productId);
     if (item) {
       item.count = count;
       if (item.count <= 0) {
@@ -74,13 +82,13 @@ export class CartService {
   }
 
   removeFromCart(productId: string) {
-    const currentCart = this.cartSubject.value.filter(item => item.product._id !== productId);
+    const currentCart = this.cartSubject.value.filter(item => this.getProductId(item.product) !== productId);
     this.updateCart(currentCart);
   }
 
   acceptNewPrice(productId: string, newPrice: number) {
     const currentCart = [...this.cartSubject.value];
-    const item = currentCart.find(i => i.product._id === productId);
+    const item = currentCart.find(i => this.getProductId(i.product) === productId);
     if (item) {
       item.price = newPrice;
       item.isPriceChanged = false;
@@ -91,10 +99,13 @@ export class CartService {
   private updateCart(cart: CartItem[]) {
     this.cartSubject.next(cart);
     if (this.authService.isLoggedIn()) {
-      // Sync to DB
-      this.http.patch<ApiResponse<{ cart: CartItem[] }>>(`${this.userUrl}/updateCart`, { cart }).subscribe();
+      this.http.patch<ApiResponse<{ cart: CartItem[] }>>(`${this.userUrl}/updateCart`, {
+        cart: this.toApiCart(cart)
+      }).subscribe({
+        next: (res) => this.cartSubject.next(this.normalizeCart(res.data.cart || cart)),
+        error: () => this.fetchUserCart()
+      });
     } else {
-      // Save to local storage
       localStorage.setItem('cart', JSON.stringify(cart));
     }
   }
@@ -105,5 +116,30 @@ export class CartService {
     if (this.authService.isLoggedIn()) {
       this.http.patch<ApiResponse<{ cart: CartItem[] }>>(`${this.userUrl}/updateCart`, { cart: [] }).subscribe();
     }
+  }
+
+  getItemProductId(item: CartItem): string {
+    return this.getProductId(item.product);
+  }
+
+  private getProductId(product: Product | string | null | undefined): string {
+    if (!product) return '';
+    if (typeof product === 'string') return product;
+    return product._id || '';
+  }
+
+  private toApiCart(cart: CartItem[]) {
+    return cart
+      .map(item => ({
+        product: this.getProductId(item.product),
+        count: item.count,
+        price: item.price,
+        isPriceChanged: item.isPriceChanged
+      }))
+      .filter(item => item.product);
+  }
+
+  private normalizeCart(cart: CartItem[] | null | undefined): CartItem[] {
+    return (cart || []).filter(item => this.getProductId(item?.product));
   }
 }

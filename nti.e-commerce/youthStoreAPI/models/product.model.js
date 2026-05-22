@@ -13,6 +13,7 @@ const productSchema = new mongoose.Schema({
   price: {
     type: Number,
     required: [true, 'Product must have a price'],
+    min: [0, 'Product price cannot be negative'],
   },
   img: {
     type: String,
@@ -22,6 +23,7 @@ const productSchema = new mongoose.Schema({
     type: Number,
     required: [true, 'Product must have stock count'],
     default: 0,
+    min: [0, 'Product stock cannot be negative'],
   },
   category: {
     type: mongoose.Schema.ObjectId,

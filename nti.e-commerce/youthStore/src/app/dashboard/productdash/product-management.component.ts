@@ -82,6 +82,9 @@ interface ProductForm {
        <div class="modal-dialog modal-lg modal-dialog-centered">
          <div class="modal-content rounded-5 border-0 p-4">
             <h4 class="fw-bold mb-4">{{editingId ? 'Edit' : 'Add'}} Product</h4>
+            <div class="alert alert-danger rounded-4 small" *ngIf="formError">
+              {{ formError }}
+            </div>
             <div class="row g-3">
               <div class="col-md-6">
                 <label class="small fw-bold">Title</label>
@@ -89,7 +92,7 @@ interface ProductForm {
               </div>
               <div class="col-md-6">
                 <label class="small fw-bold">Price</label>
-                <input type="number" class="form-control rounded-pill" [(ngModel)]="currentProd.price">
+                <input type="number" class="form-control rounded-pill" min="0" step="1" [(ngModel)]="currentProd.price">
               </div>
               <div class="col-12">
                 <label class="small fw-bold">Description</label>
@@ -97,7 +100,7 @@ interface ProductForm {
               </div>
               <div class="col-md-4">
                 <label class="small fw-bold">Stock</label>
-                <input type="number" class="form-control rounded-pill" [(ngModel)]="currentProd.stock">
+                <input type="number" class="form-control rounded-pill" min="0" step="1" [(ngModel)]="currentProd.stock">
               </div>
               <div class="col-md-4">
                 <label class="small fw-bold">Gender</label>
@@ -158,6 +161,7 @@ export class ProductManagementComponent implements OnInit {
   showForm = false;
   editingId: string | null = null;
   selectedFile: File | null = null;
+  formError = '';
 
   currentProd: ProductForm = {
     title: '',
@@ -195,6 +199,7 @@ export class ProductManagementComponent implements OnInit {
   openForm() {
     this.editingId = null;
     this.selectedFile = null;
+    this.formError = '';
     this.currentProd = {
       title: '', price: 0, desc: '', stock: 0,
       gender: 'unisex', season: '', category: this.categories[0]?._id || '',
@@ -206,6 +211,7 @@ export class ProductManagementComponent implements OnInit {
   editProduct(prod: Product) {
     this.editingId = prod._id;
     this.selectedFile = null;
+    this.formError = '';
     this.currentProd = {
       title: prod.title,
       price: prod.price,
@@ -229,6 +235,20 @@ export class ProductManagementComponent implements OnInit {
   }
 
   saveProduct() {
+    this.formError = '';
+    this.currentProd.price = Number(this.currentProd.price);
+    this.currentProd.stock = Number(this.currentProd.stock);
+
+    if (!Number.isFinite(this.currentProd.price) || this.currentProd.price < 0) {
+      this.formError = 'Price cannot be negative.';
+      return;
+    }
+
+    if (!Number.isFinite(this.currentProd.stock) || this.currentProd.stock < 0) {
+      this.formError = 'Stock cannot be negative.';
+      return;
+    }
+
     const formData = new FormData();
     const prodObj = this.currentProd as any;
     Object.keys(prodObj).forEach(key => {

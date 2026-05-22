@@ -23,6 +23,7 @@ app.use('/api/v1/users', require('./routes/user.route'));
 app.use('/api/v1/products', require('./routes/product.route'));
 app.use('/api/v1/categories', require('./routes/category.route'));
 app.use('/api/v1/subcategories', require('./routes/subCategory.route'));
+app.use('/api/v1/carts', require('./routes/cart.route'));
 app.use('/api/v1/orders', require('./routes/order.route'));
 app.use('/api/v1/testimonials', require('./routes/testimonial.route'));
 app.use('/api/v1/reports', require('./routes/report.route'));

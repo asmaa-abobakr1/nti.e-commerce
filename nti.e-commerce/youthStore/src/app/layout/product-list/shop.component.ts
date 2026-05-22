@@ -18,6 +18,7 @@ export class ShopComponent implements OnInit {
   private productService = inject(ProductService);
   private cartService = inject(CartService);
   private route = inject(ActivatedRoute);
+  readonly maxPriceLimit = 100000;
 
   products: Product[] = [];
   categories: Category[] = [];
@@ -29,7 +30,7 @@ export class ShopComponent implements OnInit {
     category: '',
     subCategory: '',
     minPrice: 0,
-    maxPrice: 1000,
+    maxPrice: 100000,
     sort: '-createdAt'
   };
 
@@ -51,8 +52,8 @@ export class ShopComponent implements OnInit {
     }
     if (this.filters.category) apiFilters['category'] = this.filters.category;
     if (this.filters.subCategory) apiFilters['subCategory'] = this.filters.subCategory;
-    apiFilters['price[gte]'] = Number(this.filters.minPrice);
-    apiFilters['price[lte]'] = Number(this.filters.maxPrice);
+    if (this.filters.minPrice > 0) apiFilters['price[gte]'] = Number(this.filters.minPrice);
+    if (this.filters.maxPrice < this.maxPriceLimit) apiFilters['price[lte]'] = Number(this.filters.maxPrice);
     apiFilters['sort'] = this.filters.sort;
 
     this.productService.getProducts(apiFilters).subscribe(res => {
@@ -100,7 +101,7 @@ export class ShopComponent implements OnInit {
       category: '',
       subCategory: '',
       minPrice: 0,
-      maxPrice: 1000,
+      maxPrice: this.maxPriceLimit,
       sort: '-createdAt'
     };
     this.applyFilters();

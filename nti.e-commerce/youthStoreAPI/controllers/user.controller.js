@@ -1,14 +1,40 @@
 const User = require('../models/user.model');
 const AppError = require('../utilites/appError.uti');
 
+const normalizeCart = (cart = []) => {
+  if (!Array.isArray(cart)) return [];
+
+  return cart
+    .map((item) => {
+      const product = item.product && (item.product._id || item.product.id || item.product);
+
+      return {
+        product,
+        count: Math.max(Number(item.count) || 1, 1),
+        price: Math.max(Number(item.price ?? item.product?.price ?? 0) || 0, 0),
+        isPriceChanged: Boolean(item.isPriceChanged)
+      };
+    })
+    .filter((item) => item.product);
+};
+
 exports.getMe = async (req, res, next) => {
   try {
     console.log('Fetching profile for user ID:', req.user.id);
     const user = await User.findById(req.user.id).populate('cart.product');
     console.log('User found:', !!user);
+    if (!user) return next(new AppError('No user found with that ID', 404));
     
     // Check for price changes
     let isChanged = false;
+    user.cart = user.cart.filter(item => {
+      if (!item.product) {
+        isChanged = true;
+        return false;
+      }
+      return true;
+    });
+
     user.cart.forEach(item => {
       if (item.product && item.product.price !== item.price) {
         item.isPriceChanged = true;
@@ -78,8 +104,12 @@ exports.deleteAddress = async (req, res, next) => {
 exports.updateCart = async (req, res, next) => {
   try {
     const user = await User.findById(req.user.id);
-    user.cart = req.body.cart; // Expecting full cart array
+    if (!user) return next(new AppError('No user found with that ID', 404));
+
+    user.cart = normalizeCart(req.body.cart);
     await user.save();
+    await user.populate('cart.product');
+
     res.status(200).json({ status: 'success', data: { cart: user.cart } });
   } catch (err) { next(err); }
 };

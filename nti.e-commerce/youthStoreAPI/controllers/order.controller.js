@@ -101,7 +101,11 @@ exports.cancelOrder = async (req, res, next) => {
 
 exports.requestRefund = async (req, res, next) => {
   try {
-    const order = await Order.findByIdAndUpdate(req.params.id, { refundStatus: 'requested' }, { returnDocument: 'after' });
+    const order = await Order.findById(req.params.id);
+    if (order.status !== 'delivered') {
+      return next(new AppError('Only delivered orders can be refunded', 400));
+    }
+    await Order.findByIdAndUpdate(req.params.id, { refundStatus: 'requested' }, { returnDocument: 'after' });
     res.status(200).json({ status: 'success', data: { order } });
   } catch (err) { next(err); }
 };
@@ -125,7 +129,14 @@ exports.approveRefund = async (req, res, next) => {
 
 exports.deleteOrder = async (req, res, next) => {
   try {
+    const order = await Order.findById(req.params.id);
+    if (order) {
+      // Restore stock for each product in the order
+      for (const item of order.products) {
+        await Product.findByIdAndUpdate(item.product, { $inc: { stock: item.count } });
+      }
+    }
     await Order.findByIdAndUpdate(req.params.id, { isDeleted: true });
-    res.status(204).json({ status: 'success', data: null });
+    res.status(200).json({ status: 'success', data: null });
   } catch (err) { next(err); }
 };

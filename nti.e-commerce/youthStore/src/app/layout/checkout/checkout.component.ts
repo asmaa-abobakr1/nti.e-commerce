@@ -55,7 +55,7 @@ export class CheckoutComponent implements OnInit {
 
     this.cartService.cart$.pipe(take(1)).subscribe(cart => {
       const orderData = {
-        products: cart.map(item => ({ product: item.product._id, count: item.count })),
+        products: cart.map(item => ({ product: this.cartService.getItemProductId(item), count: item.count })),
         address: `${address.alias}: ${address.details} (Tel: ${address.phone})`,
         paymentMethod: 'cash'
       };

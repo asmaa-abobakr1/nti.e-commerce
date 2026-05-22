@@ -10,8 +10,8 @@ const addressSchema = new mongoose.Schema({
 
 const cartItemSchema = new mongoose.Schema({
   product: { type: mongoose.Schema.ObjectId, ref: 'Product', required: true },
-  count: { type: Number, default: 1 },
-  price: { type: Number, required: true }, // Price at time of adding
+  count: { type: Number, default: 1, min: 1 },
+  price: { type: Number, required: true, min: 0 }, // Price at time of adding
   isPriceChanged: { type: Boolean, default: false }
 });
 

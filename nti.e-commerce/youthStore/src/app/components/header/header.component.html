@@ -37,8 +37,8 @@
         
         <a routerLink="/cart" class="position-relative text-dark cart-icon">
           <i class="fas fa-shopping-bag fs-4"></i>
-          <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-primary" *ngIf="(cartService.cart$ | async)?.length">
-            {{ (cartService.cart$ | async)?.length }}
+          <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-primary" *ngIf="(cartService.cartCount$ | async) as cartCount">
+            {{ cartCount }}
           </span>
         </a>
 

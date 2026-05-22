@@ -30,14 +30,14 @@
                 <td class="fw-bold">${{item.price}}</td>
                 <td>
                   <div class="d-flex align-items-center gap-2">
-                    <button class="btn btn-sm btn-outline-primary rounded-circle" (click)="cartService.updateCount(item.product._id, item.count - 1)">-</button>
+                    <button class="btn btn-sm btn-outline-primary rounded-circle" (click)="cartService.updateCount(cartService.getItemProductId(item), item.count - 1)">-</button>
                     <span class="fw-bold px-2">{{item.count}}</span>
-                    <button class="btn btn-sm btn-outline-primary rounded-circle" (click)="cartService.updateCount(item.product._id, item.count + 1)" [disabled]="item.count >= item.product.stock">+</button>
+                    <button class="btn btn-sm btn-outline-primary rounded-circle" (click)="cartService.updateCount(cartService.getItemProductId(item), item.count + 1)" [disabled]="item.count >= item.product.stock">+</button>
                   </div>
                 </td>
                 <td class="fw-bolder text-primary">${{item.price * item.count}}</td>
                 <td class="pe-4">
-                  <button class="btn text-danger" (click)="cartService.removeFromCart(item.product._id)">
+                  <button class="btn text-danger" (click)="cartService.removeFromCart(cartService.getItemProductId(item))">
                     <i class="fas fa-trash-alt"></i>
                   </button>
                 </td>
@@ -77,11 +77,11 @@
                 </td>
                 <td>
                   <div class="d-flex align-items-center gap-2">
-                    <button class="btn btn-sm btn-success rounded-pill px-3 fw-bold" (click)="acceptNewPrice(item.product._id, item.product.price)">Accept Price</button>
+                    <button class="btn btn-sm btn-success rounded-pill px-3 fw-bold" (click)="acceptNewPrice(cartService.getItemProductId(item), item.product.price)">Accept Price</button>
                   </div>
                 </td>
                 <td class="pe-4 text-end">
-                  <button class="btn text-danger" (click)="cartService.removeFromCart(item.product._id)">
+                  <button class="btn text-danger" (click)="cartService.removeFromCart(cartService.getItemProductId(item))">
                     <i class="fas fa-trash-alt"></i>
                   </button>
                 </td>
