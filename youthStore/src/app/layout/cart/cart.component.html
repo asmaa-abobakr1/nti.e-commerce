@@ -1,0 +1,126 @@
+<div class="container py-5">
+  <h2 class="fw-bolder mb-5">Shopping <span class="text-primary">Cart</span></h2>
+
+  <div class="row g-5">
+    
+    <div class="col-lg-8">
+      <div class="card border-0 shadow-sm rounded-5 overflow-hidden">
+        <div class="table-responsive">
+          <table class="table table-hover align-middle mb-0">
+            <thead class="bg-light">
+              <tr>
+                <th class="ps-4 py-3">Product</th>
+                <th>Price</th>
+                <th>Quantity</th>
+                <th>Total</th>
+                <th class="pe-4"></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let item of validItems$ | async">
+                <td class="ps-4 py-4">
+                  <div class="d-flex align-items-center gap-3">
+                    <img [src]="item.product.img" class="rounded-4" width="80" height="80" style="object-fit: cover;">
+                    <div>
+                      <h6 class="fw-bold mb-0">{{item.product.title}}</h6>
+                      <small class="text-gray">{{item.product.category?.title}}</small>
+                    </div>
+                  </div>
+                </td>
+                <td class="fw-bold">${{item.price}}</td>
+                <td>
+                  <div class="d-flex align-items-center gap-2">
+                    <button class="btn btn-sm btn-outline-primary rounded-circle" (click)="cartService.updateCount(cartService.getItemProductId(item), item.count - 1)">-</button>
+                    <span class="fw-bold px-2">{{item.count}}</span>
+                    <button class="btn btn-sm btn-outline-primary rounded-circle" (click)="cartService.updateCount(cartService.getItemProductId(item), item.count + 1)" [disabled]="item.count >= item.product.stock">+</button>
+                  </div>
+                </td>
+                <td class="fw-bolder text-primary">${{item.price * item.count}}</td>
+                <td class="pe-4">
+                  <button class="btn text-danger" (click)="cartService.removeFromCart(cartService.getItemProductId(item))">
+                    <i class="fas fa-trash-alt"></i>
+                  </button>
+                </td>
+              </tr>
+              <tr *ngIf="!(cartService.cart$ | async)?.length">
+                <td colspan="5" class="text-center py-5">
+                  <div class="py-4">
+                    <i class="fas fa-shopping-cart fs-1 text-gray mb-3 opacity-25"></i>
+                    <h5 class="text-gray">Your cart is empty</h5>
+                    <a routerLink="/shop" class="btn btn-primary rounded-pill px-5 mt-3">Start Shopping</a>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="card border-0 shadow-sm rounded-5 overflow-hidden mt-4 border border-warning" *ngIf="(changedItems$ | async)?.length">
+        <div class="card-header bg-warning text-dark fw-bold py-3">
+          <i class="fas fa-exclamation-triangle me-2"></i> Items with Price Changes
+          <p class="small mb-0 fw-normal">The price of these items has changed since you added them. Please accept the new price to proceed.</p>
+        </div>
+        <div class="table-responsive">
+          <table class="table table-hover align-middle mb-0 bg-light">
+            <tbody>
+              <tr *ngFor="let item of changedItems$ | async">
+                <td class="ps-4 py-4">
+                  <div class="d-flex align-items-center gap-3">
+                    <img [src]="item.product.img" class="rounded-4" width="80" height="80" style="object-fit: cover;">
+                    <div>
+                      <h6 class="fw-bold mb-0">{{item.product.title}}</h6>
+                      <small class="text-gray text-decoration-line-through">Old Price: ${{item.price}}</small><br>
+                      <small class="text-danger fw-bold">New Price: ${{item.product.price}}</small>
+                    </div>
+                  </div>
+                </td>
+                <td>
+                  <div class="d-flex align-items-center gap-2">
+                    <button class="btn btn-sm btn-success rounded-pill px-3 fw-bold" (click)="acceptNewPrice(cartService.getItemProductId(item), item.product.price)">Accept Price</button>
+                  </div>
+                </td>
+                <td class="pe-4 text-end">
+                  <button class="btn text-danger" (click)="cartService.removeFromCart(cartService.getItemProductId(item))">
+                    <i class="fas fa-trash-alt"></i>
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    
+    <div class="col-lg-4" *ngIf="(cartService.cart$ | async)?.length">
+      <div class="card glass-morphism p-4 rounded-5 border-0 shadow-lg">
+        <h4 class="fw-bold mb-4">Summary</h4>
+        
+        <div class="d-flex justify-content-between mb-3">
+          <span class="text-gray">Subtotal</span>
+          <span class="fw-bold">${{total$ | async}}</span>
+        </div>
+        <div class="d-flex justify-content-between mb-3">
+          <span class="text-gray">Shipping</span>
+          <span class="text-success fw-bold">Free</span>
+        </div>
+        <hr>
+        <div class="d-flex justify-content-between mb-4">
+          <span class="fs-5 fw-bold">Total</span>
+          <span class="fs-4 fw-bolder text-primary">${{total$ | async}}</span>
+        </div>
+
+        <div class="alert alert-warning rounded-4 small" *ngIf="!authService.isLoggedIn()">
+          <i class="fas fa-info-circle me-2"></i> Please <a routerLink="/login" class="fw-bold text-decoration-none">login</a> to proceed to checkout.
+        </div>
+
+        <button class="btn btn-primary w-100 rounded-pill py-3 fw-bold fs-5 shadow-lg" 
+                routerLink="/checkout" 
+                [disabled]="!authService.isLoggedIn() || ((changedItems$ | async)?.length || 0) > 0 || ((validItems$ | async)?.length || 0) === 0">
+          CHECKOUT <i class="fas fa-arrow-right ms-2"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

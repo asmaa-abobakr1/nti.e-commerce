@@ -1,0 +1,60 @@
+<div class="container-fluid py-4">
+  <div class="row g-4">
+    
+    <div class="col-lg-2">
+      <div class="card glass-morphism border-0 shadow-sm rounded-5 p-4 sticky-top" style="top: 100px;">
+        <h5 class="fw-bold mb-4">Admin Panel</h5>
+        <div class="d-flex flex-column gap-2">
+          <a routerLink="/admin/home" routerLinkActive="btn-primary" [routerLinkActiveOptions]="{exact: true}"
+            class="btn text-start rounded-pill px-4 py-2 btn-light">
+            <i class="fas fa-home me-2"></i>Overview
+          </a>
+          <a routerLink="/admin/orders" routerLinkActive="btn-primary"
+            class="btn text-start rounded-pill px-4 py-2 btn-light">
+            <i class="fas fa-shopping-cart me-2"></i>Orders
+          </a>
+          <a routerLink="/admin/products" routerLinkActive="btn-primary"
+            class="btn text-start rounded-pill px-4 py-2 btn-light">
+            <i class="fas fa-box me-2"></i>Products
+          </a>
+          <a routerLink="/admin/categories" routerLinkActive="btn-primary"
+            class="btn text-start rounded-pill px-4 py-2 btn-light">
+            <i class="fas fa-list me-2"></i>Categories
+          </a>
+          <a routerLink="/admin/subcategories" routerLinkActive="btn-primary"
+            class="btn text-start rounded-pill px-4 py-2 btn-light">
+            <i class="fas fa-tags me-2"></i>SubCategories
+          </a>
+          <a routerLink="/admin/users" routerLinkActive="btn-primary"
+            class="btn text-start rounded-pill px-4 py-2 btn-light">
+            <i class="fas fa-users me-2"></i>Users
+          </a>
+          <a routerLink="/admin/settings" routerLinkActive="btn-primary"
+            class="btn text-start rounded-pill px-4 py-2 btn-light">
+            <i class="fas fa-cog me-2"></i>Site Settings
+          </a>
+          <a routerLink="/admin/reviews" routerLinkActive="btn-primary"
+            class="btn text-start rounded-pill px-4 py-2 btn-light">
+            <i class="fas fa-star me-2"></i>Reviews
+          </a>
+          <a routerLink="/admin/messages" routerLinkActive="btn-primary"
+            class="btn text-start rounded-pill px-4 py-2 btn-light">
+            <i class="fas fa-envelope me-2"></i>Messages
+          </a>
+          <hr>
+          <a routerLink="/admin/reports" routerLinkActive="btn-primary"
+            class="btn btn-outline-primary rounded-pill px-4 py-2 text-start">
+            <i class="fas fa-chart-line me-2"></i>Sales Reports
+          </a>
+        </div>
+      </div>
+    </div>
+
+    
+    <div class="col-lg-10">
+      <div class="card border-0 shadow-sm rounded-5 p-5 min-vh-100">
+        <router-outlet></router-outlet>
+      </div>
+    </div>
+  </div>
+</div>

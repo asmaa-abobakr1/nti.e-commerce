@@ -1,0 +1,79 @@
+<div class="testimonial-slider-wrapper">
+  
+  <div class="testimonial-slider-container overflow-hidden py-4" (mouseenter)="stopAutoPlay()" (mouseleave)="startAutoPlay()">
+    <div class="testimonials-track d-flex gap-4 px-3" [style.transform]="'translateX(' + (-currentIndex * (100 / itemsPerView)) + '%)'" style="transition: transform 0.5s ease-in-out;">
+      <div
+        *ngFor="let testimonial of testimonials"
+        class="testimonial-card glass-morphism p-4 rounded-5 shadow-sm"
+        style="flex: 0 0 calc(100% / 3); min-width: 300px;"
+      >
+        
+        <div class="d-flex gap-1 text-warning mb-3">
+          <i class="fas fa-star" *ngFor="let star of getStarsArray(testimonial?.stars)"></i>
+        </div>
+
+        
+        <p class="fst-italic text-gray mb-4">"{{ testimonial?.content }}"</p>
+
+        
+        <div class="d-flex align-items-center gap-3">
+          <div
+            class="avatar bg-primary text-white rounded-circle d-flex align-items-center justify-content-center fw-bold avatar-testimonial"
+          >
+            {{ (testimonial?.user?.name || testimonial?.name)?.charAt(0)?.toUpperCase() }}
+          </div>
+          <div class="flex-grow-1">
+            <h6 class="mb-0 fw-bold">{{ testimonial?.user?.name || testimonial?.name }}</h6>
+            <small class="text-gray">{{
+              testimonial?.date | date: "short"
+            }}</small>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  
+  <div
+    class="slider-controls mt-4 d-flex justify-content-center gap-2 align-items-center"
+  >
+    
+    <button
+      class="btn btn-outline-primary rounded-circle"
+      (click)="prevSlide()"
+      [disabled]="testimonials.length === 0"
+      title="Previous"
+    >
+      <i class="fas fa-chevron-left"></i>
+    </button>
+
+    
+    <div class="d-flex gap-2 mx-3">
+      <button
+        *ngFor="let dot of getDots(); let i = index"
+        class="dot rounded-circle"
+        [class.active]="currentIndex === i"
+        (click)="goToSlide(i)"
+        [title]="'Go to testimonial ' + (i + 1)"
+        [attr.aria-label]="'Go to testimonial ' + (i + 1)"
+      >
+        <span class="visually-hidden">{{ i + 1 }}</span>
+      </button>
+    </div>
+
+    
+    <button
+      class="btn btn-outline-primary rounded-circle"
+      (click)="nextSlide()"
+      [disabled]="testimonials.length === 0"
+      title="Next"
+    >
+      <i class="fas fa-chevron-right"></i>
+    </button>
+  </div>
+
+  
+  <div *ngIf="testimonials.length === 0" class="text-center py-5">
+    <p class="text-gray">No testimonials available yet.</p>
+  </div>
+</div>

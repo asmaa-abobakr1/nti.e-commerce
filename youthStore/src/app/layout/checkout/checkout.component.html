@@ -1,0 +1,105 @@
+<div class="container py-5">
+  <div class="row g-5">
+    
+    <div class="col-lg-8">
+      <div class="card border-0 shadow-sm rounded-5 p-5 mb-4">
+        <h4 class="fw-bold mb-4">Shipping Address</h4>
+        
+        <div class="row g-3">
+          <div class="col-md-6" *ngFor="let addr of user?.addresses">
+            <div class="address-card p-4 rounded-4 border-2 transition-all cursor-pointer" 
+                 [class.border-primary]="selectedAddressId === addr._id"
+                 [class.border-light]="selectedAddressId !== addr._id"
+                 (click)="selectedAddressId = addr._id">
+              <div class="d-flex justify-content-between align-items-center mb-2">
+                <h6 class="fw-bold mb-0 text-uppercase small">{{addr.alias}}</h6>
+                <i class="fas fa-check-circle text-primary" *ngIf="selectedAddressId === addr._id"></i>
+              </div>
+              <p class="small text-gray mb-1">{{addr.details}}</p>
+              <p class="small fw-bold mb-0">{{addr.phone}}</p>
+            </div>
+          </div>
+          
+          <div class="col-md-6">
+            <div class="address-card p-4 rounded-4 border-2 border-dashed border-light d-flex align-items-center justify-content-center cursor-pointer hover-bg-light"
+                 (click)="showAddressForm = true" *ngIf="!showAddressForm">
+              <div class="text-center">
+                <i class="fas fa-plus-circle text-primary mb-2 fs-3"></i>
+                <p class="small fw-bold mb-0">Add New Address</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        
+        <div class="mt-4 p-4 bg-light rounded-4" *ngIf="showAddressForm">
+          <h6 class="fw-bold mb-3">New Address</h6>
+          <div class="row g-3">
+            <div class="col-md-6">
+              <input type="text" class="form-control rounded-pill" [(ngModel)]="newAddress.alias" placeholder="Label (Home, Work...)">
+            </div>
+            <div class="col-md-6">
+              <input type="text" class="form-control rounded-pill" [(ngModel)]="newAddress.phone" placeholder="Phone">
+            </div>
+            <div class="col-12">
+              <textarea class="form-control rounded-4" rows="3" [(ngModel)]="newAddress.details" placeholder="Full address details..."></textarea>
+            </div>
+          </div>
+          <div class="d-flex gap-2 mt-3">
+            <button class="btn btn-primary rounded-pill px-4" (click)="saveNewAddress()">Save Address</button>
+            <button class="btn btn-light rounded-pill px-4" (click)="showAddressForm = false">Cancel</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="card border-0 shadow-sm rounded-5 p-5">
+        <h4 class="fw-bold mb-4">Payment Method</h4>
+        <div class="payment-option p-4 rounded-4 border-2 border-primary bg-light d-flex align-items-center gap-3">
+          <i class="fas fa-money-bill-wave text-primary fs-3"></i>
+          <div>
+            <h6 class="fw-bold mb-0">Cash on Delivery (COD)</h6>
+            <p class="small text-gray mb-0">Pay when you receive your order</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    
+    <div class="col-lg-4">
+      <div class="card glass-morphism p-4 rounded-5 border-0 shadow-lg sticky-top" style="top: 100px;">
+        <h4 class="fw-bold mb-4">Order Summary</h4>
+        
+        <div class="order-items mb-4" style="max-height: 300px; overflow-y: auto;">
+          <div class="d-flex gap-3 mb-3" *ngFor="let item of cartService.cart$ | async">
+            <img [src]="item.product.img" width="50" height="50" class="rounded-3" style="object-fit: cover;">
+            <div class="flex-grow-1">
+              <h6 class="small fw-bold mb-0 text-truncate" style="max-width: 150px;">{{item.product.title}}</h6>
+              <small class="text-gray">{{item.count}} x ${{item.price}}</small>
+            </div>
+            <span class="small fw-bold">${{item.count * item.price}}</span>
+          </div>
+        </div>
+
+        <hr>
+        <div class="d-flex justify-content-between mb-2">
+          <span class="text-gray">Items Total</span>
+          <span class="fw-bold">${{total$ | async}}</span>
+        </div>
+        <div class="d-flex justify-content-between mb-4">
+          <span class="fs-5 fw-bold">Grand Total</span>
+          <span class="fs-4 fw-bolder text-primary">${{total$ | async}}</span>
+        </div>
+
+        <div class="alert alert-danger rounded-4 small" *ngIf="error">
+          {{error}}
+        </div>
+
+        <button class="btn btn-primary w-100 rounded-pill py-3 fw-bold fs-5 shadow-lg" 
+                (click)="placeOrder()"
+                [disabled]="!selectedAddressId || user?.role === 'admin'">
+          PLACE ORDER
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

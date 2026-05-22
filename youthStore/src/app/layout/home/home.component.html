@@ -1,0 +1,155 @@
+
+<section class="hero-section position-relative overflow-hidden py-5 d-flex align-items-center" style="min-height: 80vh; background: radial-gradient(circle at 10% 20%, rgba(99, 102, 241, 0.1) 0%, rgba(236, 72, 153, 0.05) 90%);">
+  <div class="mesh-gradient"></div>
+  <div class="container position-relative">
+    <div class="row align-items-center">
+      <div class="col-lg-7" data-aos="fade-up">
+        <span class="badge bg-primary-soft text-primary rounded-pill px-3 py-2 mb-4 fw-bold">
+          {{ settings?.heroBadge || "NEW COLLECTION 2026" }}
+        </span>
+        <h1 class="display-2 fw-bolder mb-4 text-dark lh-1">
+          <span class="text-gradient d-block">{{ settings?.heroTitle || "STYLE THAT" }}</span>
+          {{ settings?.heroTitlePart2 || "DEFINES YOU" }}
+        </h1>
+        <p class="lead mb-5 text-gray fs-4 w-75">
+          {{ settings?.heroSubtitle || "Experience the ultimate fusion of comfort and street style with YouthStore's exclusive drops." }}
+        </p>
+        <div class="d-flex gap-3">
+          <a routerLink="/shop" class="btn btn-primary btn-lg px-5 rounded-pill shadow-xl fs-5 py-3">
+            {{ settings?.shopBtnText || "Shop Collection" }} <i class="fas fa-arrow-right ms-2"></i>
+          </a>
+          <a routerLink="/shop" class="btn btn-outline-dark btn-lg px-5 rounded-pill fs-5 py-3">
+            {{ settings?.lookbookBtnText || "View Lookbook" }}
+          </a>
+        </div>
+      </div>
+      <div class="col-lg-5 d-none d-lg-block" data-aos="zoom-out">
+        <div class="hero-img-wrapper">
+          <div class="blob-shape"></div>
+          <img
+            [src]="settings?.heroImage || 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&q=80&w=1000'"
+            class="img-fluid rounded-5 shadow-2xl floating-img"
+            alt="Youth Fashion"
+            style="z-index: 2; position: relative;"
+          />
+          <div class="stat-card glass-morphism p-3 rounded-4 shadow-lg position-absolute top-0 end-0 mt-5 me-n3 animate-bounce-slow" style="z-index: 3;">
+            <div class="d-flex align-items-center gap-2">
+              <div class="bg-success rounded-circle p-2"><i class="fas fa-check text-white small"></i></div>
+              <span class="fw-bold">{{ settings?.qualityCardText || "Premium Quality" }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<app-marketing-slider 
+  *ngIf="settings?.marketingImages?.length" 
+  [images]="settings!.marketingImages">
+</app-marketing-slider>
+
+
+<section class="py-5 bg-white">
+  <div class="container">
+    <div class="d-flex justify-content-between align-items-end mb-5">
+      <div>
+        <h6 class="text-primary fw-bold text-uppercase tracking-widest mb-2">
+          {{ settings?.newArrivalsSubTitle || "The Latest" }}
+        </h6>
+        <h2 class="display-5 fw-bold mb-0">
+          {{ settings?.newArrivalsTitle || "New Arrivals" }}
+        </h2>
+      </div>
+      <a routerLink="/shop" class="btn btn-link text-dark fw-bold text-decoration-none">View All <i class="fas fa-chevron-right ms-1"></i></a>
+    </div>
+    <div class="row g-4">
+      <div class="col-md-4 col-lg-2" *ngFor="let prod of newArrivals">
+        <app-product-card
+          [product]="prod"
+          layout="compact"
+          (addToCart)="addToCart($event)"
+        ></app-product-card>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<section class="py-5 bg-light position-relative overflow-hidden">
+  <div class="mesh-gradient opacity-05"></div>
+  <div class="container position-relative">
+    <div class="text-center mb-5">
+      <h6 class="text-secondary fw-bold text-uppercase tracking-widest mb-2">
+        {{ settings?.bestSellersSubTitle || "Popular Choice" }}
+      </h6>
+      <h2 class="display-5 fw-bold mb-0">
+        {{ settings?.bestSellersTitle || "Best Sellers" }}
+      </h2>
+    </div>
+    <div class="row g-4">
+      <div class="col-md-6 col-lg-3" *ngFor="let prod of bestSellers">
+        <app-product-card
+          [product]="prod"
+          layout="grid"
+          (addToCart)="addToCart($event)"
+        ></app-product-card>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<section class="py-5 bg-white overflow-hidden">
+  <div class="container">
+    <div class="text-center mb-5">
+      <h6 class="text-primary fw-bold text-uppercase tracking-widest mb-2">
+        {{ settings?.testimonialsSubTitle || "Community" }}
+      </h6>
+      <h2 class="display-5 fw-bold mb-0">
+        {{ settings?.testimonialsTitle || "What They Say" }}
+      </h2>
+    </div>
+    <app-testimonial-slider
+      [testimonials]="testimonials"
+    ></app-testimonial-slider>
+
+    
+    <div class="row justify-content-center mt-5" *ngIf="authService.isLoggedIn() && !authService.isAdmin()">
+      <div class="col-md-8 col-lg-6">
+        <div class="card glass-morphism border-0 shadow-sm rounded-5 p-4">
+          <h4 class="fw-bold mb-4 text-center">Leave a Review</h4>
+          
+          <div *ngIf="reviewSubmitted" class="alert alert-success rounded-4 small text-center">
+            Thank you! Your review has been submitted and is waiting for approval.
+          </div>
+          <div *ngIf="reviewError" class="alert alert-danger rounded-4 small">
+            {{ reviewError }}
+          </div>
+
+          <form (ngSubmit)="submitReview()" *ngIf="!reviewSubmitted">
+            <div class="mb-3">
+              <label class="form-label small fw-bold">Your Name</label>
+              <input type="text" class="form-control rounded-pill" [(ngModel)]="newReview.name" name="name" required>
+            </div>
+            <div class="mb-3">
+              <label class="form-label small fw-bold">Rating (1-5)</label>
+              <input type="number" class="form-control rounded-pill" [(ngModel)]="newReview.stars" name="stars" min="1" max="5" required>
+            </div>
+            <div class="mb-4">
+              <label class="form-label small fw-bold">Your Review</label>
+              <textarea class="form-control rounded-4" rows="3" [(ngModel)]="newReview.content" name="content" required></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary w-100 rounded-pill py-2 fw-bold">Submit Review</button>
+          </form>
+        </div>
+      </div>
+    </div>
+    
+    <div class="text-center mt-4" *ngIf="!authService.isLoggedIn() || authService.isAdmin()">
+      <p class="text-gray small" *ngIf="!authService.isLoggedIn()">Please <a routerLink="/login" class="fw-bold text-decoration-none">login</a> to leave a review.</p>
+      <p class="text-gray small" *ngIf="authService.isAdmin()">Administrators cannot submit reviews.</p>
+    </div>
+  </div>
+</section>
