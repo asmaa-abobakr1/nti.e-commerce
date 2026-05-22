@@ -72,7 +72,9 @@ exports.getAllOrders = async (req, res, next) => {
 
 exports.updateOrderStatus = async (req, res, next) => {
   try {
-    const order = await Order.findByIdAndUpdate(req.params.id, { status: req.body.status }, { returnDocument: 'after' });
+    let order = await Order.findByIdAndUpdate(req.params.id, { status: req.body.status }, { returnDocument: 'after' });
+    // Populate product details for order components
+    order = await Order.findById(order._id).populate('products.product');
     res.status(200).json({ status: 'success', data: { order } });
   } catch (err) { next(err); }
 };
