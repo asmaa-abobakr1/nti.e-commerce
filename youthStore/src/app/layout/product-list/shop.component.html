@@ -47,7 +47,7 @@
         (change)="applyFilters()"
         title="Filter by sub-category"
       >
-        <option value="">All SubCategories</option>
+        <option value="">Products</option>
         <option *ngFor="let sub of filteredSubCategories" [value]="sub._id">{{ sub.title }}</option>
       </select>
     </div>
