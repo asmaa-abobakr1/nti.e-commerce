@@ -43,7 +43,13 @@ export class HeaderComponent implements OnInit {
 
   getSubsForCat(catId: string): SubCategory[] {
     return this.subCategories.filter(s => {
-      const id = typeof s.category === 'string' ? s.category : s.category?._id;
+      if (Array.isArray(s.category)) {
+        return s.category.some(cat => {
+          const id = typeof cat === 'string' ? cat : cat?._id;
+          return id === catId;
+        });
+      }
+      const id = typeof s.category === 'string' ? s.category : (s.category as any)?._id;
       return id === catId;
     });
   }

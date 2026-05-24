@@ -1,15 +1,32 @@
 const Order = require('../models/order.model');
 
-exports.getSalesReport = async (req, res, next) => {
+exports.getSalesReport = async (req, res) => {
   try {
     const { startDate, endDate } = req.query;
-    
+
+    if (!startDate || !endDate) {
+      return res.status(400).json({
+        status: 'fail',
+        message: 'startDate and endDate are required'
+      });
+    }
+
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+    // Include the whole end day
+    end.setHours(23, 59, 59, 999);
+
+    if (isNaN(start.getTime()) || isNaN(end.getTime())) {
+      return res.status(400).json({
+        status: 'fail',
+        message: 'Invalid date format. Use YYYY-MM-DD'
+      });
+    }
+
     const filter = {
-      orderAt: {
-        $gte: new Date(startDate),
-        $lte: new Date(endDate)
-      },
-      status: { $nin: ['cancelbyuser', 'canceledbyadmin'] } 
+      orderAt: { $gte: start, $lte: end },
+      status: { $nin: ['cancelbyuser', 'canceledbyadmin'] },
+      isDeleted: { $ne: true }
     };
 
     const stats = await Order.aggregate([
@@ -36,12 +53,18 @@ exports.getSalesReport = async (req, res, next) => {
       { $sort: { _id: 1 } }
     ]);
 
-    res.status(200).json({
+    return res.status(200).json({
       status: 'success',
       data: {
-        summary: stats[0] || { totalRevenue: 0, totalOrders: 0 },
+        summary: stats[0] || { totalRevenue: 0, totalOrders: 0, avgOrderValue: 0 },
         dailyStats
       }
     });
-  } catch (err) { next(err); }
+  } catch (err) {
+    console.error('Sales report error:', err);
+    return res.status(500).json({
+      status: 'error',
+      message: 'Failed to generate sales report'
+    });
+  }
 };

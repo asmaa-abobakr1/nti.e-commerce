@@ -18,7 +18,7 @@ export class ShopComponent implements OnInit {
   private productService = inject(ProductService);
   private cartService = inject(CartService);
   private route = inject(ActivatedRoute);
-  readonly maxPriceLimit = 100000;
+  readonly maxPriceLimit = 10000;
 
   products: Product[] = [];
   categories: Category[] = [];
@@ -29,9 +29,8 @@ export class ShopComponent implements OnInit {
     name: '',
     category: '',
     subCategory: '',
-    gender: '',
-    minPrice: 0,
-    maxPrice: 100000,
+    minPrice: 1,
+    maxPrice: 10000,
     sort: '-createdAt'
   };
 
@@ -39,7 +38,6 @@ export class ShopComponent implements OnInit {
     this.route.queryParams.subscribe(params => {
       if (params['category']) this.filters.category = params['category'];
       if (params['subCategory']) this.filters.subCategory = params['subCategory'];
-      if (params['gender']) this.filters.gender = params['gender'];
       this.loadProducts();
     });
     this.loadCategories();
@@ -54,8 +52,7 @@ export class ShopComponent implements OnInit {
     }
     if (this.filters.category) apiFilters['category'] = this.filters.category;
     if (this.filters.subCategory) apiFilters['subCategory'] = this.filters.subCategory;
-    if (this.filters.gender) apiFilters['gender'] = this.filters.gender;
-    if (this.filters.minPrice > 0) apiFilters['price[gte]'] = Number(this.filters.minPrice);
+    if (this.filters.minPrice > 1) apiFilters['price[gte]'] = Number(this.filters.minPrice);
     if (this.filters.maxPrice < this.maxPriceLimit) apiFilters['price[lte]'] = Number(this.filters.maxPrice);
     apiFilters['sort'] = this.filters.sort;
 
@@ -82,7 +79,13 @@ export class ShopComponent implements OnInit {
       this.filteredSubCategories = this.subCategories;
     } else {
       this.filteredSubCategories = this.subCategories.filter(s => {
-        const catId = typeof s.category === 'string' ? s.category : s.category?._id;
+        if (Array.isArray(s.category)) {
+          return s.category.some(cat => {
+            const catId = typeof cat === 'string' ? cat : cat?._id;
+            return catId === this.filters.category;
+          });
+        }
+        const catId = typeof s.category === 'string' ? s.category : (s.category as any)?._id;
         return catId === this.filters.category;
       });
     }
@@ -102,8 +105,7 @@ export class ShopComponent implements OnInit {
       name: '',
       category: '',
       subCategory: '',
-      gender: '',
-      minPrice: 0,
+      minPrice: 1,
       maxPrice: this.maxPriceLimit,
       sort: '-createdAt'
     };

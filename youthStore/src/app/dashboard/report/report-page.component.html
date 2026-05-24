@@ -5,50 +5,75 @@
       <input type="date" class="form-control border-0 rounded-pill" [(ngModel)]="startDate">
       <span class="text-gray">to</span>
       <input type="date" class="form-control border-0 rounded-pill" [(ngModel)]="endDate">
-      <button class="btn btn-primary rounded-pill px-4" (click)="fetchReport()">Update</button>
+      <button class="btn btn-primary rounded-pill px-4" (click)="fetchReport()" [disabled]="isLoading">
+        <span *ngIf="isLoading" class="spinner-border spinner-border-sm me-1"></span>
+        {{ isLoading ? 'Loading...' : 'Update' }}
+      </button>
     </div>
   </div>
 
-  <div class="row g-4 mb-5">
-    <div class="col-md-4">
-      <div class="card border-0 shadow-sm rounded-5 p-4 bg-primary text-white">
-        <h6 class="text-white-50 small mb-2">Total Revenue</h6>
-        <h2 class="fw-bolder mb-0">${{summary.totalRevenue}}</h2>
-      </div>
-    </div>
-    <div class="col-md-4">
-      <div class="card border-0 shadow-sm rounded-5 p-4 bg-white">
-        <h6 class="text-gray small mb-2">Total Orders</h6>
-        <h2 class="fw-bolder mb-0 text-dark">{{summary.totalOrders}}</h2>
-      </div>
-    </div>
-    <div class="col-md-4">
-      <div class="card border-0 shadow-sm rounded-5 p-4 bg-white">
-        <h6 class="text-gray small mb-2">Avg. Order Value</h6>
-        <h2 class="fw-bolder mb-0 text-dark">${{summary.avgOrderValue | number:'1.0-0'}}</h2>
-      </div>
-    </div>
+  <!-- Error Message -->
+  <div *ngIf="errorMessage" class="alert alert-danger rounded-4 mb-4">
+    ⚠️ {{ errorMessage }}
   </div>
 
-  <div class="card border-0 shadow-sm rounded-5 p-5">
-    <h4 class="fw-bold mb-4">Daily Revenue</h4>
-    <div class="table-responsive">
-      <table class="table align-middle">
-        <thead>
-          <tr>
-            <th>Date</th>
-            <th>Orders</th>
-            <th>Revenue</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let day of dailyStats">
-            <td class="fw-bold">{{day._id}}</td>
-            <td>{{day.count}}</td>
-            <td class="fw-bolder text-primary">${{day.revenue}}</td>
-          </tr>
-        </tbody>
-      </table>
+  <!-- Loading Skeleton -->
+  <div *ngIf="isLoading" class="text-center py-5">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Loading...</span>
     </div>
+    <p class="text-muted mt-3">Fetching report data...</p>
   </div>
+
+  <ng-container *ngIf="!isLoading">
+    <div class="row g-4 mb-5">
+      <div class="col-md-4">
+        <div class="card border-0 shadow-sm rounded-5 p-4 bg-primary text-white">
+          <h6 class="text-white-50 small mb-2">Total Revenue</h6>
+          <h2 class="fw-bolder mb-0">${{ summary.totalRevenue | number:'1.2-2' }}</h2>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card border-0 shadow-sm rounded-5 p-4 bg-white">
+          <h6 class="text-gray small mb-2">Total Orders</h6>
+          <h2 class="fw-bolder mb-0 text-dark">{{ summary.totalOrders }}</h2>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card border-0 shadow-sm rounded-5 p-4 bg-white">
+          <h6 class="text-gray small mb-2">Avg. Order Value</h6>
+          <h2 class="fw-bolder mb-0 text-dark">${{ summary.avgOrderValue | number:'1.0-0' }}</h2>
+        </div>
+      </div>
+    </div>
+
+    <div class="card border-0 shadow-sm rounded-5 p-5">
+      <h4 class="fw-bold mb-4">Daily Revenue</h4>
+
+      <!-- No Data State -->
+      <div *ngIf="dailyStats.length === 0" class="text-center py-5 text-muted">
+        <i class="bi bi-bar-chart fs-1 d-block mb-3"></i>
+        No orders found for the selected date range.
+      </div>
+
+      <div *ngIf="dailyStats.length > 0" class="table-responsive">
+        <table class="table align-middle">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Orders</th>
+              <th>Revenue</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let day of dailyStats">
+              <td class="fw-bold">{{ day._id }}</td>
+              <td>{{ day.count }}</td>
+              <td class="fw-bolder text-primary">${{ day.revenue | number:'1.2-2' }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </ng-container>
 </div>

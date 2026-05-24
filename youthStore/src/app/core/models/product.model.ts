@@ -10,7 +10,7 @@ export interface Category {
 export interface SubCategory {
   _id: string;
   title: string;
-  category: string | Category;
+  category: string[] | Category[];
   isActive: boolean;
   isDeleted: boolean;
   createdAt: string;

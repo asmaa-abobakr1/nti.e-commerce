@@ -187,8 +187,14 @@ export class ProductManagementComponent implements OnInit {
 
   get filteredSubCategories(): SubCategory[] {
     return this.subCategories.filter(s => {
-       const catId = typeof s.category === 'string' ? s.category : s.category._id;
-       return catId === this.currentProd.category;
+      if (Array.isArray(s.category)) {
+        return s.category.some(cat => {
+          const catId = typeof cat === 'string' ? cat : cat?._id;
+          return catId === this.currentProd.category;
+        });
+      }
+      const catId = typeof s.category === 'string' ? s.category : (s.category as any)?._id;
+      return catId === this.currentProd.category;
     });
   }
 

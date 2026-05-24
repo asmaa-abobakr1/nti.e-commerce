@@ -15,6 +15,26 @@ export class ProductCardComponent {
   @Input() layout: 'grid' | 'compact' = 'grid'; 
   @Output() addToCart = new EventEmitter<Product>();
 
+  showModal = false;
+
+  openModal() {
+    this.showModal = true;
+    document.body.classList.add('modal-open');
+  }
+
+  closeModal(event?: Event) {
+    if (event) {
+      event.stopPropagation();
+    }
+    this.showModal = false;
+    document.body.classList.remove('modal-open');
+  }
+
+  onAddToCartWithStop(event: Event) {
+    event.stopPropagation();
+    this.onAddToCart();
+  }
+
   onAddToCart() {
     this.addToCart.emit(this.product);
   }

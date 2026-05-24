@@ -6,11 +6,11 @@ const subCategorySchema = new mongoose.Schema({
     required: [true, 'SubCategory must have a title'],
     trim: true,
   },
-  category: {
+  category: [{
     type: mongoose.Schema.ObjectId,
     ref: 'Category',
     required: [true, 'SubCategory must belong to a category'],
-  },
+  }],
   isActive: {
     type: Boolean,
     default: true,
