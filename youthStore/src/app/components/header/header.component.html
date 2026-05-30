@@ -1,65 +1,60 @@
 <nav class="navbar navbar-expand-lg glass-morphism sticky-top py-3">
   <div class="container">
     
+    <button class="sidebar-toggle-btn me-3" style="margin-right: 10px;" (click)="toggleSidebar()" aria-label="Open categories">
+  <span class="hamburger-line single"></span>
+  <span class="hamburger-line single"></span>
+  <span class="hamburger-line single"></span>
+</button>
+<a class="navbar-brand fw-bolder fs-3 text-primary" style="color: black !important;  " routerLink="/">{{ settings?.siteName || 'YOUTH STORE' }}</a>
+<!-- Direct navigation links always visible -->
+<ul class="navbar-nav mx-auto">
+      <li class="nav-item">
+        <a class="nav-link fw-semibold px-3" routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">Home</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link fw-semibold px-3" routerLink="/shop" routerLinkActive="active">Shop</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link fw-semibold px-3" routerLink="/testimonials" routerLinkActive="active">Testimonials</a>
+      </li>
+
+      <li class="nav-item">
+        <a class="nav-link fw-semibold px-3" routerLink="/contact" routerLinkActive="active">Contact Us</a>
+      </li>
+      <li class="nav-item" *ngIf="authService.isAdmin()">
+        <a class="nav-link fw-semibold px-3 text-danger" routerLink="/admin" routerLinkActive="active">Admin</a>
+      </li>
+      
+    </ul>
+
+    <div class="d-flex align-items-center gap-3">
     
-    <button class="sidebar-toggle-btn me-3" (click)="toggleSidebar()" aria-label="Open categories menu" id="sidebarToggleBtn">
-      <span class="hamburger-line"></span>
-      <span class="hamburger-line"></span>
-      <span class="hamburger-line"></span>
-    </button>
 
-    <a class="navbar-brand fw-bolder fs-3 text-primary" routerLink="/">{{ settings?.siteName || 'YOUTH STORE' }}</a>
-    
-    <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-label="Toggle navigation">
-      <span class="navbar-toggler-icon"></span>
-    </button>
+      <a routerLink="/cart" class="position-relative text-dark cart-icon">
+        <i class="fas fa-shopping-bag fs-4"></i>
+        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-primary" *ngIf="(cartService.cartCount$ | async) as cartCount">
+          {{ cartCount }}
+        </span>
+      </a>
 
-    <div class="collapse navbar-collapse" id="navbarNav">
-      <ul class="navbar-nav mx-auto">
-        <li class="nav-item">
-          <a class="nav-link fw-semibold px-3" routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">Home</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link fw-semibold px-3" routerLink="/shop" routerLinkActive="active">Shop</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link fw-semibold px-3" routerLink="/testimonials" routerLinkActive="active">Testimonials</a>
-        </li>
-        <li class="nav-item" *ngIf="authService.isAdmin()">
-          <a class="nav-link fw-semibold px-3 text-danger" routerLink="/admin" routerLinkActive="active">Admin</a>
-        </li>
-      </ul>
+      <ng-container *ngIf="!(authService.user$ | async); else userMenu">
+        <a routerLink="/login" class="btn btn-outline-primary rounded-pill px-4 login-btn">Login</a>
+      </ng-container>
 
-      <div class="d-flex align-items-center gap-3">
-        <div class="search-box d-none d-md-block">
-          <input type="text" class="form-control rounded-pill" placeholder="Search clothes...">
+      <ng-template #userMenu>
+        <div class="dropdown">
+          <button class="btn btn-primary rounded-pill px-4 dropdown-toggle" type="button" id="profileDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+            <i class="fas fa-user-circle me-2"></i>Profile
+          </button>
+          <ul class="dropdown-menu dropdown-menu-end border-0 shadow-lg rounded-4 p-2 mt-3" aria-labelledby="profileDropdown">
+            <li><a class="dropdown-item rounded-3 py-2" routerLink="/profile">Edit Your Profile</a></li>
+            <li *ngIf="!authService.isAdmin()"><a class="dropdown-item rounded-3 py-2" routerLink="/profile">My Orders</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><button class="dropdown-item rounded-3 py-2 text-danger" (click)="authService.logout()">Logout</button></li>
+          </ul>
         </div>
-        
-        <a routerLink="/cart" class="position-relative text-dark cart-icon">
-          <i class="fas fa-shopping-bag fs-4"></i>
-          <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-primary" *ngIf="(cartService.cartCount$ | async) as cartCount">
-            {{ cartCount }}
-          </span>
-        </a>
-
-        <ng-container *ngIf="!(authService.user$ | async); else userMenu">
-          <a routerLink="/login" class="btn btn-outline-primary rounded-pill px-4">Login</a>
-        </ng-container>
-        
-        <ng-template #userMenu>
-          <div class="dropdown">
-            <a class="btn btn-primary rounded-pill px-4 dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
-              <i class="fas fa-user-circle me-2"></i>Profile
-            </a>
-            <ul class="dropdown-menu dropdown-menu-end border-0 shadow-lg rounded-4 p-2 mt-3">
-              <li><a class="dropdown-item rounded-3 py-2" routerLink="/profile">My Orders</a></li>
-              <li><a class="dropdown-item rounded-3 py-2" routerLink="/profile/addresses">Addresses</a></li>
-              <li><hr class="dropdown-divider"></li>
-              <li><button class="dropdown-item rounded-3 py-2 text-danger" (click)="authService.logout()">Logout</button></li>
-            </ul>
-          </div>
-        </ng-template>
-      </div>
+      </ng-template>
     </div>
   </div>
 </nav>

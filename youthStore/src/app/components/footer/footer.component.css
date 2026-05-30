@@ -1,0 +1,28 @@
+.navbar .container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+}
+
+@media (max-width: 768px) {
+  .navbar .nav-link {
+    font-size: 0.9rem;
+    padding: 0.5rem;
+  }
+  .navbar .sidebar-toggle-btn {
+    margin-right: auto;
+  }
+}
+
+/* Footer responsive */
+@media (max-width: 768px) {
+  .footer .row {
+    flex-wrap: wrap;
+  }
+  .footer .col-lg-4,
+  .footer .col-lg-2 {
+    flex: 0 0 100% !important;
+    max-width: 100% !important;
+    margin-bottom: 1.5rem;
+  }
+}

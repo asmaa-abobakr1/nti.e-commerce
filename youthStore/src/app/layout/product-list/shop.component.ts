@@ -1,7 +1,8 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject } from '@angular/core';
+import { Subscription } from 'rxjs';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router, RouterModule, ActivatedRoute } from '@angular/router';
+import { Router, RouterModule, ActivatedRoute, NavigationEnd } from '@angular/router';
 import { ProductService } from '../../core/service/product-service';
 import { CartService } from '../../core/service/cart-service';
 import { ProductCardComponent } from '../../components/product-card/product-card.component';
@@ -14,10 +15,12 @@ import { Product, Category, SubCategory } from '../../models/interfaces';
   templateUrl: './shop.component.html',
   styleUrls: ['./shop.component.css']
 })
-export class ShopComponent implements OnInit {
+export class ShopComponent implements OnInit, OnDestroy {
+  private routerSubscription?: Subscription;
   private productService = inject(ProductService);
   private cartService = inject(CartService);
   private route = inject(ActivatedRoute);
+  private router = inject(Router);
   readonly maxPriceLimit = 10000;
 
   products: Product[] = [];
@@ -35,6 +38,8 @@ export class ShopComponent implements OnInit {
   };
 
   ngOnInit() {
+    // Reset filters and load products on initial navigation
+    this.resetFilters();
     this.route.queryParams.subscribe(params => {
       if (params['category']) this.filters.category = params['category'];
       if (params['subCategory']) this.filters.subCategory = params['subCategory'];
@@ -42,6 +47,23 @@ export class ShopComponent implements OnInit {
     });
     this.loadCategories();
     this.loadSubCategories();
+
+    // Listen for future navigation events to refresh the shop page when revisited
+    this.routerSubscription = this.router.events.subscribe(event => {
+      if (event instanceof NavigationEnd) {
+        // Assuming the shop route contains '/shop' pattern
+        if (event.urlAfterRedirects.includes('/shop')) {
+          this.resetFilters();
+          this.loadProducts();
+        }
+      }
+    });
+  }
+
+  ngOnDestroy() {
+    if (this.routerSubscription) {
+      this.routerSubscription.unsubscribe();
+    }
   }
 
   loadProducts() {

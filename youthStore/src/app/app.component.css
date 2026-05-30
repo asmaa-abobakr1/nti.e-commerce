@@ -1,0 +1,34 @@
+.blur-overlay {
+  position: fixed;
+  top: 70px; /* offset to avoid covering navbar */
+  left: 0;
+  width: 100%;
+  height: calc(100% - 70px);
+  background-color: rgba(255, 255, 255, 0.35);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  z-index: 900; /* below modal backdrop (1000) but above page content */
+  transform: translate3d(0, 0, 0);
+  backface-visibility: hidden;
+  will-change: transform, backdrop-filter;
+}
+
+
+/* Remove old blur rule as we now use .blur-overlay */
+
+/* Remove rule that hides header/footer when modal is open */
+/*
+.modal-open app-header,
+.modal-open app-footer {
+  display: none;
+}
+*/
+
+body.modal-open {
+  overflow-y: scroll; /* keep scrollbar space to avoid layout shift */
+}
+
+/* Fluid main content - allow nested sections to stretch edge-to-edge */
+.content {
+  width: 100%;
+}

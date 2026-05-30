@@ -1,7 +1,8 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
-import { Product } from '../../models/interfaces';
+import { RouterModule, Router } from '@angular/router';
+import { Product } from '../../core/models/product.model';
+import { ModalService } from '../../services/modal.service';
 
 @Component({
   selector: 'app-product-card',
@@ -11,23 +12,18 @@ import { Product } from '../../models/interfaces';
   styleUrls: ['./product-card.component.css']
 })
 export class ProductCardComponent {
+  constructor(private router: Router, private modalSrv: ModalService) {}
+
   @Input() product!: Product;
-  @Input() layout: 'grid' | 'compact' = 'grid'; 
+  @Input() layout: 'grid' | 'compact' = 'grid';
   @Output() addToCart = new EventEmitter<Product>();
 
-  showModal = false;
-
-  openModal() {
-    this.showModal = true;
-    document.body.classList.add('modal-open');
-  }
-
-  closeModal(event?: Event) {
+  /** Open modal using global service */
+  openModal(event?: Event) {
     if (event) {
       event.stopPropagation();
     }
-    this.showModal = false;
-    document.body.classList.remove('modal-open');
+    this.modalSrv.open(this.product);
   }
 
   onAddToCartWithStop(event: Event) {

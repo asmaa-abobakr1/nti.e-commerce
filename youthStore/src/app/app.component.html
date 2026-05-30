@@ -1,7 +1,13 @@
 <app-header></app-header>
-
-<main class="min-vh-100">
-  <router-outlet></router-outlet>
-</main>
-
+<div class="content">
+  <div class="blur-overlay" *ngIf="blurActive"></div>
+  <main class="min-vh-100">
+    <router-outlet></router-outlet>
+  </main>
+</div>
 <app-footer></app-footer>
+
+<!-- Global Product Detail Modal -->
+<app-fullscreen-modal></app-fullscreen-modal>
+
+

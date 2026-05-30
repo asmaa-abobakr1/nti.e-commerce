@@ -1,0 +1,47 @@
+<div class="fullscreen-modal-backdrop" (click)="onBackgroundClick()" *ngIf="visible && product">
+  <div class="details-modal-content" (click)="$event.stopPropagation()">
+    <button class="close-btn" (click)="onBackgroundClick()" title="Close details">
+      <i class="fas fa-times"></i>
+    </button>
+    <div class="row g-0 h-100">
+      <div class="col-md-6 modal-img-container position-relative">
+        <img [src]="product.img" class="modal-img" [alt]="product.title || 'Product image'" />
+        <div class="modal-badge-container position-absolute top-0 start-0 m-4 d-flex flex-column gap-2">
+          <span *ngIf="product.isNewArrival" class="badge bg-primary rounded-pill px-3 py-2 fw-bold text-uppercase">NEW</span>
+          <span *ngIf="product.isBestSeller" class="badge bg-warning text-dark rounded-pill px-3 py-2 fw-bold text-uppercase">BEST SELLER</span>
+        </div>
+      </div>
+      <div class="col-md-6 modal-details-container d-flex flex-column justify-content-between p-4 p-lg-5">
+        <div>
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <span class="badge bg-primary-soft text-primary px-3 py-2 rounded-pill fw-bold text-uppercase fs-7">
+              {{ product.category?.title || 'Collection' }}
+            </span>
+            <span class="text-uppercase tracking-wider small fw-bold text-muted">{{ product.gender }}</span>
+          </div>
+          <h2 class="fw-bolder mb-3 text-dark fs-2 lh-sm">{{ product.title }}</h2>
+          <p class="text-primary fw-bolder fs-3 mb-4">${{ product.price }}</p>
+          <hr class="my-4 text-muted opacity-25" />
+          <h6 class="fw-bold text-dark mb-2">Description</h6>
+          <p class="text-gray lh-base mb-4 fs-6 description-truncate">{{ product.desc || 'No description available for this item.' }}</p>
+          <div class="stock-info d-flex align-items-center gap-2 mb-4">
+            <span class="status-indicator" [ngClass]="{'bg-success': product.stock > 3, 'bg-warning': product.stock > 0 && product.stock <= 3, 'bg-danger': product.stock === 0}"></span>
+            <span class="fw-bold small" [ngClass]="{'text-success': product.stock > 3, 'text-warning': product.stock > 0 && product.stock <= 3, 'text-danger': product.stock === 0}">
+              <span *ngIf="product.stock > 3">In Stock ({{ product.stock }} items available)</span>
+              <span *ngIf="product.stock > 0 && product.stock <= 3">Only {{ product.stock }} left in stock!</span>
+              <span *ngIf="product.stock === 0">Out of Stock</span>
+            </span>
+          </div>
+        </div>
+        <div>
+          <button class="btn btn-primary btn-lg w-100 rounded-pill py-3 fw-bold d-flex align-items-center justify-content-center gap-2 shadow-lg"
+                  (click)="onBackgroundClick()"
+                  [disabled]="product.stock === 0">
+            <i class="fas fa-shopping-cart"></i>
+            {{ product.stock === 0 ? 'Out of Stock' : 'Add to Cart' }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

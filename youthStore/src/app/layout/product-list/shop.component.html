@@ -47,7 +47,7 @@
         (change)="applyFilters()"
         title="Filter by sub-category"
       >
-        <option value="">Products</option>
+        <option value="">All Products</option>
         <option *ngFor="let sub of filteredSubCategories" [value]="sub._id">{{ sub.title }}</option>
       </select>
     </div>
@@ -83,6 +83,9 @@
 
   </div>
 
+</div>
+
+<div class="shop-content">
   <div class="products-grid" *ngIf="products.length > 0">
     <div class="product-cell" *ngFor="let prod of products">
       <app-product-card
@@ -103,5 +106,4 @@
       <i class="fas fa-redo-alt me-2"></i>Clear Filters
     </button>
   </div>
-
 </div>

@@ -21,7 +21,7 @@ import { Product, Order } from '../../models/interfaces';
       <div class="col-md-4">
         <div class="card border-0 shadow-sm rounded-4 p-4 bg-dark text-white">
           <p class="small mb-1 opacity-75 text-uppercase fw-bold">Active Orders</p>
-          <h2 class="fw-bolder mb-0">{{activeOrders}}</h2>
+          <h2 class="fw-bolder mb-0" style="color: white;">{{activeOrders}}</h2>
         </div>
       </div>
       <div class="col-md-4">

@@ -52,7 +52,7 @@
 }
 
 .dropdown-item:hover {
-  background-color: rgba(99, 102, 241, 0.08);
+  background-color: var(--primary-soft);
   color: var(--primary);
 }
 
@@ -80,7 +80,7 @@
 }
 
 .sidebar-toggle-btn:hover {
-  background: rgba(99, 102, 241, 0.1);
+  background: var(--primary-soft);
 }
 
 .hamburger-line {
@@ -134,7 +134,8 @@
   align-items: center;
   justify-content: space-between;
   padding: 1.25rem 1.5rem;
-  background: linear-gradient(135deg, var(--primary), #818cf8);
+  background: var(--secondary);
+  border-bottom: 1px solid var(--primary);
   color: white;
   flex-shrink: 0;
 }
@@ -195,7 +196,7 @@
 }
 
 .sidebar-all-link:hover {
-  background: rgba(99, 102, 241, 0.08);
+  background: var(--primary-soft);
   color: var(--primary);
 }
 
@@ -233,7 +234,7 @@
 }
 
 .category-main-link:hover {
-  background: rgba(99, 102, 241, 0.08);
+  background: var(--primary-soft);
   color: var(--primary);
 }
 
@@ -241,7 +242,7 @@
   width: 34px;
   height: 34px;
   border-radius: 8px;
-  background: rgba(99, 102, 241, 0.1);
+  background: var(--primary-soft);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -253,7 +254,7 @@
 
 .category-main-link:hover .category-icon-wrap {
   background: var(--primary);
-  color: white;
+  color: var(--dark);
 }
 
 .category-title {
@@ -276,7 +277,7 @@
 }
 
 .sub-toggle-btn:hover {
-  background: rgba(99, 102, 241, 0.1);
+  background: var(--primary-soft);
   color: var(--primary);
 }
 
@@ -315,7 +316,7 @@
 }
 
 .sub-category-link:hover {
-  background: rgba(99, 102, 241, 0.08);
+  background: var(--primary-soft);
   color: var(--primary);
 }
 
@@ -337,4 +338,37 @@
   padding: 1rem 1.5rem;
   border-top: 1px solid #f1f5f9;
   flex-shrink: 0;
+}
+
+@media (max-width: 768px) {
+  .navbar .container {
+    max-width: 100% !important;
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+}
+
+/* Mobile navbar vertical layout */
+@media (max-width: 768px) {
+  .navbar .navbar-nav {
+    flex-direction: row;
+    align-items: flex-start;
+    font-size: 10px;
+  }
+  .navbar .nav-link {
+    padding: 0.5rem 0;
+    width: 100%;
+  }
+}
+
+
+@media (max-width: 768px) {
+  .navbar .login-btn,
+  .navbar .cart-icon {
+    /* display: none !important; */
+  }
+  .btn{
+    font-size: 12px !important;
+    padding: 0.5rem 1.5rem !important;
+  }
 }

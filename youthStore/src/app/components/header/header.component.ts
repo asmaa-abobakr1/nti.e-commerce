@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, HostListener } from '@angular/core';
+import { Component, OnInit, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { AuthService } from '../../core/service/auth-service';
@@ -15,10 +15,7 @@ import { Category, SubCategory, Settings } from '../../models/interfaces';
   styleUrls: ['./header.component.css']
 })
 export class HeaderComponent implements OnInit {
-  public authService = inject(AuthService);
-  public cartService = inject(CartService);
-  private settingsService = inject(SettingsService);
-  private productService = inject(ProductService);
+  constructor(public authService: AuthService, public cartService: CartService, private settingsService: SettingsService, private productService: ProductService) {}
   
   settings: Settings | null = null;
   categories: Category[] = [];
@@ -71,8 +68,7 @@ export class HeaderComponent implements OnInit {
     this.expandedCat = this.expandedCat === catId ? null : catId;
   }
 
-  @HostListener('document:keydown.escape')
-  onEscapeKey() {
-    if (this.sidebarOpen) this.closeSidebar();
-  }
+
+
+
 }
