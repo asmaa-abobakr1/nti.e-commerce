@@ -31,6 +31,10 @@ app.use('/api/v1/settings', require('./routes/settings.route'));
 app.use('/api/v1/messages', require('./routes/message.route'));
 
 
+app.get('/', (req, res) => {
+  res.json({ message: "API is running" });
+});
+
 app.use((req, res, next) => {
   next(new AppError(`Can't find ${req.originalUrl} on this server!`, 404));
 });
